@@ -1,0 +1,6 @@
+# Copy this file to config.toml and fill in your details.
+# The SEC requires automated requests to say who is making them.
+sec_user_agent = "Your Name your@email.com"
+
+# How long downloaded data is reused before refreshing (hours).
+cache_max_age_hours = 12

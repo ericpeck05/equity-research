@@ -1,0 +1,33 @@
+ticker,name,subsector
+NVDA,NVIDIA,Semiconductors
+AMD,Advanced Micro Devices,Semiconductors
+AVGO,Broadcom,Semiconductors
+INTC,Intel,Semiconductors
+QCOM,Qualcomm,Semiconductors
+TXN,Texas Instruments,Semiconductors
+MU,Micron Technology,Semiconductors
+MRVL,Marvell Technology,Semiconductors
+AMAT,Applied Materials,Semi Equipment
+LRCX,Lam Research,Semi Equipment
+KLAC,KLA,Semi Equipment
+MSFT,Microsoft,Software
+ORCL,Oracle,Software
+CRM,Salesforce,Software
+ADBE,Adobe,Software
+NOW,ServiceNow,Software
+INTU,Intuit,Software
+SNOW,Snowflake,Software
+PANW,Palo Alto Networks,Cybersecurity
+CRWD,CrowdStrike,Cybersecurity
+FTNT,Fortinet,Cybersecurity
+ZS,Zscaler,Cybersecurity
+GOOGL,Alphabet,Internet
+META,Meta Platforms,Internet
+AMZN,Amazon,Internet
+NFLX,Netflix,Internet
+UBER,Uber,Internet
+AAPL,Apple,Hardware
+DELL,Dell Technologies,Hardware
+HPQ,HP Inc.,Hardware
+ANET,Arista Networks,Hardware
+CSCO,Cisco,Hardware
