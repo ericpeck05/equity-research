@@ -132,6 +132,16 @@ def cmd_universe(a):
         print(f"{r['ticker']:<6} {r['subsector']:<22} {r['name']}")
 
 
+def cmd_site(a):
+    from . import site
+    frag = Path(a.fragments) if a.fragments else None
+    tickers = [t.upper() for t in a.tickers] or sorted(
+        d.name for d in config.COVERAGE_DIR.iterdir() if (d / "snapshot.json").exists())
+    for t in tickers:
+        print(f"Built {site.build_company(t, fragment_dir=frag)}")
+    print(f"Built {site.build_index(fragment_dir=frag)}")
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(prog="research.py", description="Free equity research data toolkit (SEC EDGAR + Yahoo).")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -168,6 +178,11 @@ def main(argv=None):
     s.set_defaults(fn=cmd_comps)
 
     s = sub.add_parser("universe", help="list the tech coverage universe"); s.set_defaults(fn=cmd_universe)
+
+    s = sub.add_parser("site", help="build the research website in docs/ (all snapshots if no tickers)")
+    s.add_argument("tickers", nargs="*")
+    s.add_argument("--fragments", help="also write body-only pages here (for publishing as artifacts)")
+    s.set_defaults(fn=cmd_site)
 
     a = p.parse_args(argv)
     a.fn(a)

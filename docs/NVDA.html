@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+</head>
+<body>
+<title>NVDA Research Snapshot</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+/* Layout: a research-note dashboard. Quote box + key numbers up top, then charts and
+   evidence in a 12-col grid that collapses to one column on phones. */
+:root {
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --sunken: #eceef2;
+  --ink: #12161d;
+  --ink-2: #464e5c;
+  --muted: #6c7482;
+  --rule: #dadee5;
+  --accent: #2456c9;
+  --accent-soft: #e4ebfa;
+  --s1: #2a78d6;
+  --s2: #eb6834;
+  --s3: #1baf7a;
+  --dot: #9aa2b0;
+  --up: #157347;
+  --down: #b9382a;
+  --tag-f: #e7e9ee;  --tag-f-ink: #3a414d;
+  --tag-m: #e3ecfb;  --tag-m-ink: #1d4aa8;
+  --tag-i: #fbf0dc;  --tag-i-ink: #85550a;
+  --f-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --f-data: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --radius: 6px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1116; --surface: #161a21; --sunken: #1c212a; --ink: #e8ebf0; --ink-2: #b3bac5;
+    --muted: #8a93a3; --rule: #2a303a; --accent: #7b9ef2; --accent-soft: #1d2840;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --dot: #6b7383; --up: #4cc38a; --down: #f07a6a;
+    --tag-f: #262b34; --tag-f-ink: #c3c9d3; --tag-m: #1d2a45; --tag-m-ink: #a9c2f7;
+    --tag-i: #3a2d15; --tag-i-ink: #f1c77a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1116; --surface: #161a21; --sunken: #1c212a; --ink: #e8ebf0; --ink-2: #b3bac5;
+  --muted: #8a93a3; --rule: #2a303a; --accent: #7b9ef2; --accent-soft: #1d2840;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --dot: #6b7383; --up: #4cc38a; --down: #f07a6a;
+  --tag-f: #262b34; --tag-f-ink: #c3c9d3; --tag-m: #1d2a45; --tag-m-ink: #a9c2f7;
+  --tag-i: #3a2d15; --tag-i-ink: #f1c77a; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-display); font-size: 15px; line-height: 1.5; }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
+.topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 9; background: var(--surface); border-bottom: 1px solid var(--rule); }
+.topbar .wrap { display: flex; align-items: center; gap: 16px; padding-block: 10px; flex-wrap: wrap; }
+.brand { font-weight: 700; font-stretch: 80%; letter-spacing: .02em; text-transform: uppercase; font-size: 13px; color: var(--ink); text-decoration: none; }
+.topbar nav { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; }
+.topbar nav a { color: var(--ink-2); text-decoration: none; }
+.topbar nav a:hover { color: var(--accent); }
+.topbar .spacer { flex: 1; }
+.stamp { font-family: var(--f-data); font-size: 11px; color: var(--muted); }
+
+.eyebrow { font-family: var(--f-data); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(30px, 5vw, 48px); font-weight: 800; font-stretch: 78%; line-height: 1.02; letter-spacing: -.01em; }
+h2 { font-size: 20px; font-weight: 700; font-stretch: 85%; }
+h3 { font-size: 15px; font-weight: 600; }
+.prose { font-family: var(--f-body); font-size: 16px; line-height: 1.6; max-width: 68ch; color: var(--ink); }
+.num { font-family: var(--f-data); font-variant-numeric: tabular-nums; }
+
+.hero { padding-block: 28px 20px; display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 28px; align-items: start; }
+.hero .lede { font-family: var(--f-body); font-size: 19px; line-height: 1.5; color: var(--ink-2); margin: 14px 0 0; max-width: 60ch; }
+.hero .meta { display: flex; gap: 8px 18px; flex-wrap: wrap; margin-top: 16px; font-size: 13px; color: var(--muted); }
+.quote { background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); padding: 16px 18px; display: grid; gap: 12px; }
+.quote .px { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.quote .px b { font-family: var(--f-data); font-size: 30px; font-weight: 500; }
+.chg { font-family: var(--f-data); font-size: 13px; padding: 2px 6px; border-radius: 4px; }
+.chg.up { color: var(--up); background: color-mix(in srgb, var(--up) 12%, transparent); }
+.chg.down { color: var(--down); background: color-mix(in srgb, var(--down) 12%, transparent); }
+.range { display: grid; gap: 4px; font-size: 12px; color: var(--muted); }
+.range .bar { position: relative; height: 6px; background: var(--sunken); border-radius: 3px; }
+.range .bar i { position: absolute; top: -3px; width: 3px; height: 12px; background: var(--ink); border-radius: 2px; transform: translateX(-50%); }
+.range .ends { display: flex; justify-content: space-between; font-family: var(--f-data); }
+.kv { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; font-size: 13px; }
+.kv dt { color: var(--muted); } .kv dd { margin: 0; font-family: var(--f-data); text-align: right; }
+
+.kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); border: 1px solid var(--rule); border-radius: var(--radius); background: var(--surface); }
+.kpi { padding: 14px 16px; display: grid; gap: 2px; border-left: 1px solid var(--rule); }
+.kpi:first-child { border-left: 0; }
+.kpi .v { font-family: var(--f-data); font-size: 22px; font-weight: 500; }
+.kpi .l { font-size: 12px; color: var(--muted); }
+
+.section { padding-block: 28px 4px; display: grid; gap: 14px; }
+.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-bottom: 2px solid var(--ink); padding-bottom: 6px; }
+.grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; }
+.c6 { grid-column: span 6; } .c4 { grid-column: span 4; } .c8 { grid-column: span 8; } .c12 { grid-column: span 12; } .c5 { grid-column: span 5; } .c7 { grid-column: span 7; }
+.panel { background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); padding: 16px; min-width: 0; display: grid; gap: 10px; align-content: start; }
+.panel .sub { font-size: 13px; color: var(--muted); margin: -4px 0 0; }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+.chart { position: relative; width: 100%; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart text { font-family: var(--f-data); font-size: 11px; fill: var(--muted); }
+.chart .lbl { fill: var(--ink-2); }
+.chart .grid line { stroke: var(--rule); stroke-width: 1; }
+.callout { font-size: 13px; color: var(--ink-2); border-top: 1px solid var(--rule); padding-top: 8px; }
+
+.tip { position: absolute; pointer-events: none; z-index: 5; background: var(--ink); color: var(--bg); font-family: var(--f-data); font-size: 12px; line-height: 1.45; padding: 8px 10px; border-radius: 5px; white-space: nowrap; transform: translate(-50%, calc(-100% - 10px)); }
+.tip b { font-weight: 600; }
+
+.list { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.list li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 12px; padding: 11px 0; border-top: 1px solid var(--rule); }
+.list li:first-child { border-top: 0; }
+.list .txt { font-family: var(--f-body); font-size: 15.5px; line-height: 1.5; }
+.list .src { grid-column: 2; font-size: 12px; color: var(--muted); font-family: var(--f-data); }
+.tag { font-family: var(--f-data); font-size: 10.5px; font-weight: 600; letter-spacing: .04em; padding: 2px 6px; border-radius: 4px; height: fit-content; margin-top: 3px; white-space: nowrap; }
+.tag.F { background: var(--tag-f); color: var(--tag-f-ink); }
+.tag.M { background: var(--tag-m); color: var(--tag-m-ink); }
+.tag.I { background: var(--tag-i); color: var(--tag-i-ink); }
+.keyline { display: flex; gap: 10px 16px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+.keyline span { display: inline-flex; gap: 6px; align-items: center; }
+
+.exp { display: grid; gap: 0; }
+.exp .row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 16px; padding: 10px 0; border-top: 1px solid var(--rule); }
+.exp .row:first-child { border-top: 0; }
+.exp .row b { font-family: var(--f-data); font-size: 18px; font-weight: 500; text-align: right; }
+.exp .row .n { grid-column: 1 / -1; font-size: 13px; color: var(--muted); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: grid; }
+.timeline li { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-top: 1px solid var(--rule); }
+.timeline li:first-child { border-top: 0; }
+.timeline .d { font-family: var(--f-data); font-size: 12px; color: var(--muted); display: grid; gap: 2px; }
+.timeline .d em { font-style: normal; color: var(--ink-2); }
+.timeline .t { font-family: var(--f-body); font-size: 15px; }
+
+.debates { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.debate { border-top: 3px solid var(--accent); background: var(--surface); padding: 14px 16px; border-radius: 0 0 var(--radius) var(--radius); display: grid; gap: 6px; align-content: start; }
+.debate p { margin: 0; font-family: var(--f-body); font-size: 15px; color: var(--ink-2); }
+.qs { counter-reset: q; list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+.qs li { counter-increment: q; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; font-family: var(--f-body); font-size: 16px; }
+.qs li::before { content: counter(q); font-family: var(--f-data); font-size: 13px; color: var(--accent); border: 1px solid var(--accent); border-radius: 50%; width: 24px; height: 24px; display: grid; place-items: center; }
+
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { padding: 8px 12px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--rule); }
+th:first-child, td:first-child { text-align: left; position: sticky; left: 0; background: var(--surface); }
+thead th { font-family: var(--f-data); font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); background: var(--sunken); }
+thead th:first-child { background: var(--sunken); }
+td { font-family: var(--f-data); font-variant-numeric: tabular-nums; }
+td:first-child { font-family: var(--f-display); }
+tr.grp td { font-family: var(--f-display); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); background: var(--sunken); }
+tr.me td { background: var(--accent-soft); font-weight: 600; }
+tbody tr:last-child td { border-bottom: 0; }
+td.neg { color: var(--down); }
+.sources { columns: 2 320px; font-size: 13px; padding-left: 18px; }
+.sources li { break-inside: avoid; padding: 2px 0; }
+footer { padding-block: 32px 40px; color: var(--muted); font-size: 12px; }
+
+@media (max-width: 960px) {
+  .hero { grid-template-columns: minmax(0, 1fr); }
+  .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .kpi:nth-child(4) { border-left: 0; }
+  .kpi:nth-child(n+4) { border-top: 1px solid var(--rule); }
+  .c6, .c4, .c8, .c5, .c7 { grid-column: span 12; }
+}
+@media (max-width: 520px) {
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kpi:nth-child(n) { border-left: 1px solid var(--rule); border-top: 1px solid var(--rule); }
+  .kpi:nth-child(odd) { border-left: 0; }
+  .kpi:nth-child(-n+2) { border-top: 0; }
+  .timeline li { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .topbar nav { display: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .chart rect.bar, .chart circle.pt { transition: opacity .15s; }
+}
+
+</style>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="index.html">Coverage Desk</a>
+    <nav aria-label="Sections">
+      <a href="#numbers">Numbers</a><a href="#business">Business</a><a href="#valuation">Valuation</a>
+      <a href="#debates">Debates</a><a href="#financials">Financials</a>
+    </nav>
+    <span class="spacer"></span>
+    <span class="stamp" id="stamp"></span>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div>
+      <div class="eyebrow" id="eyebrow"></div>
+      <h1 id="title"></h1>
+      <p class="lede" id="headline"></p>
+      <div class="meta" id="meta"></div>
+    </div>
+    <aside class="quote" aria-label="Quote">
+      <div class="eyebrow">Last close</div>
+      <div class="px"><b id="px"></b><span id="chg"></span></div>
+      <div class="range" id="range"></div>
+      <dl class="kv" id="quotekv"></dl>
+    </aside>
+  </section>
+
+  <div class="kpis" id="kpis"></div>
+
+  <section class="section">
+    <div class="section-head"><h2>Key takeaways</h2>
+      <div class="keyline"><span><b class="tag F">FACT</b> from a filing</span><span><b class="tag M">MGMT</b> management's claim</span><span><b class="tag I">VIEW</b> analyst inference</span></div>
+    </div>
+    <div class="grid">
+      <div class="panel c8"><ul class="list" id="takeaways"></ul></div>
+      <div class="panel c4" id="guidance"></div>
+    </div>
+  </section>
+
+  <section class="section" id="numbers">
+    <div class="section-head"><h2>The numbers</h2><span class="eyebrow">Last 12 quarters · SEC XBRL</span></div>
+    <div class="grid">
+      <div class="panel c7"><h3>Quarterly revenue</h3><p class="sub">Hover a bar for year-over-year growth</p><div class="chart" id="ch-rev"></div></div>
+      <div class="panel c5"><h3>Margins</h3><div class="legend" id="lg-margin"></div><div class="chart" id="ch-margin"></div></div>
+      <div class="panel c7"><h3>Profit vs. cash</h3><p class="sub">Net income against free cash flow (operating cash flow minus capex)</p><div class="legend" id="lg-cash"></div><div class="chart" id="ch-cash"></div><div class="callout" id="cash-callout"></div></div>
+      <div class="panel c5"><h3>Commitments and exposures</h3><p class="sub">Obligations that sit outside the income statement</p><div class="exp" id="exposures"></div></div>
+    </div>
+  </section>
+
+  <section class="section" id="business">
+    <div class="section-head"><h2>Business</h2><span class="eyebrow" id="biz-src"></span></div>
+    <div class="grid">
+      <div class="panel c7"><ul class="list" id="biz"></ul><p class="callout prose" id="why"></p></div>
+      <div class="panel c5"><h3>Recent filings and events</h3><ul class="timeline" id="events"></ul></div>
+    </div>
+  </section>
+
+  <section class="section" id="valuation">
+    <div class="section-head"><h2>Valuation vs. peers</h2><span class="eyebrow" id="peer-src"></span></div>
+    <div class="grid">
+      <div class="panel c6"><h3>What the market pays for growth</h3><p class="sub">EV/EBITDA (TTM) against revenue growth (TTM)</p><div class="chart" id="ch-scatter"></div></div>
+      <div class="panel c6"><h3>Share price, 1 year</h3><p class="sub" id="px-sub"></p><div class="chart" id="ch-price"></div></div>
+      <div class="c12 tablewrap"><table id="comps"></table></div>
+    </div>
+  </section>
+
+  <section class="section" id="debates">
+    <div class="section-head"><h2>What the market is debating</h2><span class="eyebrow"><b class="tag I">VIEW</b> analyst inference</span></div>
+    <div class="debates" id="debate-cards"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h2>Questions to answer before going deeper</h2></div>
+    <div class="panel"><ol class="qs" id="questions"></ol></div>
+  </section>
+
+  <section class="section" id="financials">
+    <div class="section-head"><h2>Annual financials</h2><span class="eyebrow">$ millions except per share and % · fiscal years</span></div>
+    <div class="tablewrap"><table id="annual"></table></div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h2>Sources</h2></div>
+    <ul class="sources" id="sources"></ul>
+  </section>
+</main>
+<footer class="wrap" id="foot"></footer>
+
+<script>
+const D = {"ticker": "NVDA", "company": "NVIDIA CORP", "subsector": "Semiconductors", "generated": "2026-11-03", "snap": {"ticker": "NVDA", "name": "NVIDIA", "subsector": "Semiconductors", "prepared": "2026-11-03", "latest_quarter": "Q2 FY2027 (ended Jul 26, 2026)", "next_event": "Q3 FY2027 results, historically late November (not confirmed)", "headline": "Growth is re-accelerating at a $300B+ run rate, but NVIDIA is increasingly financing the buildout itself, and the stock is flat on the year.", "takeaways": [{"tag": "F", "text": "Revenue grew 106% YoY last quarter to $96.2B. YoY growth has risen for four straight quarters, from 56% to 106%.", "src": "SEC XBRL, 10-Q Q2 FY27"}, {"tag": "F", "text": "Data Center was $89.0B, about 92% of revenue. Gross margin is about 75% and operating margin about 66%.", "src": "10-Q Q2 FY27, MD&A"}, {"tag": "F", "text": "Cash is lagging profit: Q2 free cash flow was $21.4B against $59.7B of net income. DSO rose from 45 to 60 days on extended payment terms.", "src": "CFO commentary Q2 FY27"}, {"tag": "F", "text": "NVIDIA guaranteed up to $105B of OpenAI data center lease payments and committed $36B to rent cloud capacity back from partners.", "src": "8-K 2026-08-17; 10-Q Q2 FY27"}, {"tag": "I", "text": "At 25x trailing earnings, NVIDIA trades below Broadcom, TI and AMD. The market is not paying for current earnings; the thesis has to explain why.", "src": "Comps, SEC TTM + Yahoo price"}], "business": [{"tag": "F", "text": "Describes itself as a \"data center scale AI infrastructure company\": GPUs, Grace CPUs, NVLink and InfiniBand/Ethernet networking, full rack-scale systems, and the CUDA software stack.", "src": "10-K FY2026, Item 1"}, {"tag": "F", "text": "Two segments: Compute & Networking (Data Center, Automotive) and Graphics (GeForce gaming, RTX workstations).", "src": "10-K FY2026, Item 1"}, {"tag": "F", "text": "Within Data Center, Hyperscale was $48.7B (+102% YoY) and AI clouds, industrial & enterprise (ACIE) grew 138%.", "src": "CFO commentary Q2 FY27"}, {"tag": "F", "text": "One direct customer was 16% of Q2 revenue. In 1H, three direct customers were 16%, 15% and 13%. One AI lab contributed \"a meaningful amount\" indirectly through cloud providers.", "src": "10-Q Q2 FY27, MD&A"}, {"tag": "F", "text": "Fabless: wafers from TSMC and Samsung, memory from SK Hynix, Micron and Samsung, assembly by Hon Hai, Wistron and Fabrinet. The supply chain is \"mainly concentrated in Asia.\"", "src": "10-K FY2026, Item 1"}, {"tag": "F", "text": "Named competitors: AMD, Intel, Huawei, Broadcom, and in-house chips at Alphabet, Amazon and Microsoft.", "src": "10-K FY2026, Item 1"}], "why_it_matters": "NVIDIA is now essentially a single-market company selling to a handful of very large buyers. The stock trades on hyperscaler and AI-lab spending plans more than on its own quarterly beats.", "guidance": {"tag": "M", "text": "Q3 FY27 outlook: revenue $108.0B \u00b12% (about +12% QoQ, +89% YoY) and gross margin 74.0% \u00b150bp. Assumes no China Data Center compute revenue.", "src": "Q2 FY27 press release, 8-K 2026-08-26"}, "exposures": [{"label": "Supply & capacity commitments", "value": "$279B", "note": "Up from $119B one quarter earlier", "src": "10-Q Q2 FY27, MD&A"}, {"label": "OpenAI lease guarantees (Ohio, ~4.25 GW)", "value": "$105B cap", "note": "Pays the shortfall if OpenAI defaults; payments expected from 2028", "src": "8-K 2026-08-17"}, {"label": "Cloud capacity bought back from partners", "value": "$36B", "note": "Typically 6-year commitments under the new AI cloud partner model", "src": "10-Q Q2 FY27, MD&A"}, {"label": "Accounts receivable", "value": "$63.1B", "note": "DSO 60 days, up from 45 one quarter earlier", "src": "CFO commentary Q2 FY27"}, {"label": "Third-party AI financing platforms (MOUs)", "value": ">$500B", "note": "Preliminary; NVIDIA may give limited residual-value support", "src": "10-Q Q2 FY27, MD&A"}], "events": [{"date": "2026-09-03", "form": "8-K", "text": "Agreed to acquire Hugging Face for about $11.9B, plus up to $1.0B in retention equity.", "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000078/nvda-20260902.htm"}, {"date": "2026-08-26", "form": "10-Q / 8-K", "text": "Q2 FY27 results: revenue $96.2B, Q3 guide $108B. Vera Rubin began production shipments in Q3.", "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000075/nvda-20260726.htm"}, {"date": "2026-08-17", "form": "8-K", "text": "Residual value guarantees on OpenAI-tenanted data center leases with SB Energy, capped at $105B, with an option on about 3.8 GW more.", "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000069/nvda-20260817.htm"}, {"date": "2026-07-02", "form": "8-K", "text": "Hired Nicholas Parker, 26 years at Microsoft, as EVP Worldwide Field Operations.", "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000060/nvda-20260628.htm"}, {"date": "2026-02-25", "form": "10-K", "text": "FY2026 annual report: revenue $215.9B (+65%), including a $4.5B H20 inventory charge after China export rules changed.", "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm"}], "debates": [{"q": "Is NVIDIA financing its own demand?", "detail": "Lease guarantees, cloud buy-backs, longer payment terms and a $500B+ financing platform. How much revenue depends on NVIDIA's balance sheet, and what happens if a large AI lab can't pay?"}, {"q": "How long can customer spending last?", "detail": "Growth depends on a few hyperscalers and AI labs. Their capex guidance and their own AI revenue are the leading indicators."}, {"q": "Will custom chips cap share or margins?", "detail": "Broadcom and Marvell build hyperscalers' in-house accelerators. Watch whether NVIDIA's 75% gross margin holds as those ramp."}, {"q": "Are $279B of commitments confidence or inventory risk?", "detail": "The FY26 $4.5B H20 charge showed how quickly commitments become write-downs when demand shifts."}, {"q": "Is China an option or a zero?", "detail": "Data Center China revenue is effectively zero and excluded from guidance. Any return is upside; the question is whether the market already assumes none."}], "questions": ["NVIDIA trades at 25x trailing earnings while growing 100%+. Is the market right to be skeptical? What would make 25x expensive?", "Do the OpenAI guarantee and extended payment terms worry you, or are they normal for a dominant supplier? Compare Cisco and Lucent's vendor financing in 1999-2000.", "Which single KPI would tell you whether the bull or bear case is winning: Data Center growth, gross margin, DSO and cash conversion, or customer concentration?"], "sources": [{"label": "10-K FY2026 (filed 2026-02-25)", "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm"}, {"label": "10-Q Q2 FY2027 (filed 2026-08-26)", "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000075/nvda-20260726.htm"}, {"label": "8-K Q2 results, press release and CFO commentary (2026-08-26)", "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000073/"}, {"label": "8-K SB Energy / OpenAI guarantees (2026-08-17)", "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000069/nvda-20260817.htm"}, {"label": "8-K Hugging Face acquisition (2026-09-03)", "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000078/nvda-20260902.htm"}, {"label": "8-K executive appointment (2026-07-02)", "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000060/nvda-20260628.htm"}]}, "val": {"Company": "NVIDIA CORP", "Price": 202.05999755859375, "Market cap ($M)": 4869645.941162109, "Enterprise value ($M)": 4845425.941162109, "TTM revenue ($M)": 302969.0, "Revenue growth TTM %": 83.37529809100704, "Gross margin TTM %": 74.67463667900016, "Operating margin TTM %": 65.21426284537361, "P/E TTM": 25.24715464701761, "EV/Revenue TTM": 15.993141018262955, "EV/EBITDA TTM": 24.07473662298704, "FCF yield TTM %": 2.6081156933083074, "52w high": 239.24000549316406, "52w low": 164.79331970214844, "1y return %": -2.0958571925720815, "Sources": "price: Yahoo close 2026-11-02; shares outstanding as of 2026-08-21 (SEC cover page); TTM = 4 quarters to 2026-07-26 (SEC XBRL); EV = mkt cap + long-term debt - cash - ST investments"}, "price": [["2025-11-03", 206.39], ["2025-11-04", 198.22], ["2025-11-05", 194.74], ["2025-11-06", 187.63], ["2025-11-07", 187.7], ["2025-11-10", 198.57], ["2025-11-11", 192.7], ["2025-11-12", 193.34], ["2025-11-13", 186.41], ["2025-11-14", 189.72], ["2025-11-17", 186.15], ["2025-11-18", 180.93], ["2025-11-19", 186.07], ["2025-11-20", 180.21], ["2025-11-21", 178.45], ["2025-11-24", 182.11], ["2025-11-25", 177.4], ["2025-11-26", 179.83], ["2025-11-28", 176.58], ["2025-12-01", 179.49], ["2025-12-02", 181.03], ["2025-12-03", 179.16], ["2025-12-04", 182.95], ["2025-12-05", 181.98], ["2025-12-08", 185.12], ["2025-12-09", 184.54], ["2025-12-10", 183.35], ["2025-12-11", 180.51], ["2025-12-12", 174.61], ["2025-12-15", 175.88], ["2025-12-16", 177.31], ["2025-12-17", 170.54], ["2025-12-18", 173.73], ["2025-12-19", 180.57], ["2025-12-22", 183.26], ["2025-12-23", 188.77], ["2025-12-24", 188.17], ["2025-12-26", 190.09], ["2025-12-29", 187.78], ["2025-12-30", 187.1], ["2025-12-31", 186.06], ["2026-01-02", 188.41], ["2026-01-05", 187.68], ["2026-01-06", 186.8], ["2026-01-07", 188.67], ["2026-01-08", 184.61], ["2026-01-09", 184.43], ["2026-01-12", 184.51], ["2026-01-13", 185.38], ["2026-01-14", 182.71], ["2026-01-15", 186.61], ["2026-01-16", 185.8], ["2026-01-20", 177.65], ["2026-01-21", 182.89], ["2026-01-22", 184.41], ["2026-01-23", 187.23], ["2026-01-26", 186.03], ["2026-01-27", 188.08], ["2026-01-28", 191.07], ["2026-01-29", 192.06], ["2026-01-30", 190.68], ["2026-02-02", 185.18], ["2026-02-03", 179.92], ["2026-02-04", 173.78], ["2026-02-05", 171.48], ["2026-02-06", 184.98], ["2026-02-09", 189.6], ["2026-02-10", 188.1], ["2026-02-11", 189.61], ["2026-02-12", 186.5], ["2026-02-13", 182.38], ["2026-02-17", 184.54], ["2026-02-18", 187.54], ["2026-02-19", 187.46], ["2026-02-20", 189.38], ["2026-02-23", 191.1], ["2026-02-24", 192.4], ["2026-02-25", 195.1], ["2026-02-26", 184.46], ["2026-02-27", 176.78], ["2026-03-02", 182.05], ["2026-03-03", 179.63], ["2026-03-04", 182.61], ["2026-03-05", 182.91], ["2026-03-06", 177.4], ["2026-03-09", 182.22], ["2026-03-10", 184.34], ["2026-03-11", 185.61], ["2026-03-12", 182.72], ["2026-03-13", 179.84], ["2026-03-16", 182.8], ["2026-03-17", 181.52], ["2026-03-18", 179.99], ["2026-03-19", 178.15], ["2026-03-20", 172.31], ["2026-03-23", 175.24], ["2026-03-24", 174.8], ["2026-03-25", 178.27], ["2026-03-26", 170.85], ["2026-03-27", 167.14], ["2026-03-30", 164.79], ["2026-03-31", 174.0], ["2026-04-01", 175.35], ["2026-04-02", 176.99], ["2026-04-06", 177.23], ["2026-04-07", 177.69], ["2026-04-08", 181.66], ["2026-04-09", 183.49], ["2026-04-10", 188.2], ["2026-04-13", 188.88], ["2026-04-14", 196.06], ["2026-04-15", 198.42], ["2026-04-16", 197.9], ["2026-04-17", 201.22], ["2026-04-20", 201.6], ["2026-04-21", 199.42], ["2026-04-22", 202.04], ["2026-04-23", 199.18], ["2026-04-24", 207.8], ["2026-04-27", 216.12], ["2026-04-28", 212.68], ["2026-04-29", 208.77], ["2026-04-30", 199.11], ["2026-05-01", 198.0], ["2026-05-04", 198.03], ["2026-05-05", 196.05], ["2026-05-06", 207.36], ["2026-05-07", 211.02], ["2026-05-08", 214.71], ["2026-05-11", 218.94], ["2026-05-12", 220.28], ["2026-05-13", 225.31], ["2026-05-14", 235.2], ["2026-05-15", 224.81], ["2026-05-18", 221.81], ["2026-05-19", 220.11], ["2026-05-20", 222.96], ["2026-05-21", 219.01], ["2026-05-22", 214.84], ["2026-05-26", 214.37], ["2026-05-27", 212.12], ["2026-05-28", 213.76], ["2026-05-29", 210.66], ["2026-06-01", 223.85], ["2026-06-02", 222.31], ["2026-06-03", 214.26], ["2026-06-04", 218.42], ["2026-06-05", 204.87], ["2026-06-08", 208.41], ["2026-06-09", 207.96], ["2026-06-10", 200.2], ["2026-06-11", 204.64], ["2026-06-12", 204.96], ["2026-06-15", 212.21], ["2026-06-16", 207.18], ["2026-06-17", 204.42], ["2026-06-18", 210.45], ["2026-06-22", 208.42], ["2026-06-23", 199.82], ["2026-06-24", 198.78], ["2026-06-25", 195.52], ["2026-06-26", 192.31], ["2026-06-29", 194.75], ["2026-06-30", 199.87], ["2026-07-01", 197.36], ["2026-07-02", 194.61], ["2026-07-06", 195.33], ["2026-07-07", 196.71], ["2026-07-08", 203.89], ["2026-07-09", 202.55], ["2026-07-10", 210.72], ["2026-07-13", 203.3], ["2026-07-14", 211.56], ["2026-07-15", 212.26], ["2026-07-16", 207.17], ["2026-07-17", 202.58], ["2026-07-20", 203.05], ["2026-07-21", 207.06], ["2026-07-22", 211.82], ["2026-07-23", 208.53], ["2026-07-24", 206.61], ["2026-07-27", 196.29], ["2026-07-28", 196.79], ["2026-07-29", 189.8], ["2026-07-30", 194.82], ["2026-07-31", 200.53], ["2026-08-03", 206.41], ["2026-08-04", 211.7], ["2026-08-05", 218.97], ["2026-08-06", 218.75], ["2026-08-07", 223.71], ["2026-08-10", 217.31], ["2026-08-11", 217.26], ["2026-08-12", 223.84], ["2026-08-13", 225.05], ["2026-08-14", 224.91], ["2026-08-17", 224.76], ["2026-08-18", 219.49], ["2026-08-19", 217.32], ["2026-08-20", 216.61], ["2026-08-21", 214.48], ["2026-08-24", 208.25], ["2026-08-25", 212.81], ["2026-08-26", 209.43], ["2026-08-27", 227.73], ["2026-08-28", 217.31], ["2026-08-31", 220.53], ["2026-09-01", 217.2], ["2026-09-02", 224.16], ["2026-09-03", 228.19], ["2026-09-04", 230.1], ["2026-09-08", 225.48], ["2026-09-09", 223.42], ["2026-09-10", 218.36], ["2026-09-11", 218.29], ["2026-09-14", 210.96], ["2026-09-15", 212.17], ["2026-09-16", 213.9], ["2026-09-17", 219.34], ["2026-09-18", 222.27], ["2026-09-21", 227.38], ["2026-09-22", 228.87], ["2026-09-23", 225.51], ["2026-09-24", 224.58], ["2026-09-25", 225.07], ["2026-09-28", 228.86], ["2026-09-29", 227.21], ["2026-09-30", 228.38], ["2026-10-01", 230.86], ["2026-10-02", 233.95], ["2026-10-05", 238.9], ["2026-10-06", 239.24], ["2026-10-07", 237.47], ["2026-10-08", 230.48], ["2026-10-09", 229.28], ["2026-10-12", 226.32], ["2026-10-13", 228.52], ["2026-10-14", 221.3], ["2026-10-15", 217.23], ["2026-10-16", 214.13], ["2026-10-19", 217.09], ["2026-10-20", 216.47], ["2026-10-21", 221.97], ["2026-10-22", 212.21], ["2026-10-23", 210.96], ["2026-10-26", 216.0], ["2026-10-27", 217.94], ["2026-10-28", 215.38], ["2026-10-29", 213.66], ["2026-10-30", 204.64], ["2026-11-02", 202.06]], "annual": {"periods": ["FY2021 (Jan-21)", "FY2022 (Jan-22)", "FY2023 (Jan-23)", "FY2024 (Jan-24)", "FY2025 (Jan-25)", "FY2026 (Jan-26)"], "rows": {"Revenue": [16675000000.0, 26914000000.0, 26974000000.0, 60922000000.0, 130497000000.0, 215938000000.0], "Cost of revenue": [6279000000.0, 9439000000.0, 11618000000.0, 16621000000.0, 32639000000.0, 62475000000.0], "Gross profit": [10396000000.0, 17475000000.0, 15356000000.0, 44301000000.0, 97858000000.0, 153463000000.0], "R&D": [3924000000.0, 5268000000.0, 7339000000.0, 8675000000.0, 12914000000.0, 18497000000.0], "SG&A": [1940000000.0, 2166000000.0, 2440000000.0, 2654000000.0, 3491000000.0, 4579000000.0], "Operating income": [4532000000.0, 10041000000.0, 4224000000.0, 32972000000.0, 81453000000.0, 130387000000.0], "Net income": [4332000000.0, 9752000000.0, 4368000000.0, 29760000000.0, 72880000000.0, 120067000000.0], "Diluted EPS": [0.173, 0.385, 0.17, 1.19, 2.94, 4.9], "Diluted shares": [25100000000.0, 25350000000.0, 25070000000.0, 24940000000.0, 24804000000.0, 24514000000.0], "Operating cash flow": [5822000000.0, 9108000000.0, 5641000000.0, 28090000000.0, 64089000000.0, 102718000000.0], "Capex": [null, 976000000.0, 1833000000.0, 1069000000.0, 3236000000.0, 6042000000.0], "Stock-based comp": [1397000000.0, 2004000000.0, 2709000000.0, 3549000000.0, 4737000000.0, 6386000000.0], "D&A": [1098000000.0, 1174000000.0, 1544000000.0, 1508000000.0, 1864000000.0, 2843000000.0], "Depreciation": [486000000.0, 611000000.0, 844000000.0, 894000000.0, 1300000000.0, 2400000000.0], "Amortization of intangibles": [612000000.0, 563000000.0, 699000000.0, 614000000.0, 593000000.0, 488000000.0], "Buybacks": [0.0, 0.0, 10039000000.0, 9533000000.0, 33706000000.0, 40086000000.0], "Dividends paid": [395000000.0, 399000000.0, 398000000.0, 395000000.0, 834000000.0, 974000000.0], "Cash & equivalents": [847000000.0, 1990000000.0, 3389000000.0, 7280000000.0, 8589000000.0, 10605000000.0], "Short-term investments": [10714000000.0, 19218000000.0, 9907000000.0, 18704000000.0, 34621000000.0, 39065000000.0], "Total assets": [28791000000.0, 44187000000.0, 41182000000.0, 65728000000.0, 111601000000.0, 206803000000.0], "Total liabilities": [11898000000.0, 17575000000.0, 19081000000.0, 22750000000.0, 32274000000.0, 49510000000.0], "Long-term debt": [5964000000.0, 10946000000.0, 9703000000.0, 8459000000.0, 8463000000.0, 7469000000.0], "Deferred revenue (current)": [288000000.0, 300000000.0, 354000000.0, 764000000.0, 837000000.0, 1379000000.0], "Shareholders' equity": [16893000000.0, 26612000000.0, 22101000000.0, 42978000000.0, 79327000000.0, 157293000000.0], "Free cash flow": [null, 8132000000.0, 3808000000.0, 27021000000.0, 60853000000.0, 96676000000.0], "FCF after SBC": [null, 6128000000.0, 1099000000.0, 23472000000.0, 56116000000.0, 90290000000.0], "Net cash (debt)": [5597000000.0, 10262000000.0, 3593000000.0, 17525000000.0, 34747000000.0, 42201000000.0], "Revenue growth YoY %": [null, 61.403298350824585, 0.22293230289069932, 125.85452658115224, 114.20340763599354, 65.47353579009479], "Gross margin %": [62.3448275862069, 64.92903321691314, 56.928894490991325, 72.71757329043696, 74.98869705816992, 71.06808435754708], "Operating margin %": [27.178410794602698, 37.307720888756776, 15.65952398606065, 54.121663766783755, 62.417526839697466, 60.38168363141272], "R&D % of revenue": [23.53223388305847, 19.573456193802482, 27.20768147104619, 14.239519385443684, 9.896012935163261, 8.565884652076058], "SBC % of revenue": [8.377811094452774, 7.445938916549008, 10.043004374582932, 5.825481763566528, 3.629968505023104, 2.9573303448211985], "FCF margin %": [null, 30.214758118451364, 14.117298138948616, 44.35343554052723, 46.63172333463604, 44.770258129648326]}}, "quarterly": {"periods": ["2023-10-29", "2024-01-28", "2024-04-28", "2024-07-28", "2024-10-27", "2025-01-26", "2025-04-27", "2025-07-27", "2025-10-26", "2026-01-25", "2026-04-26", "2026-07-26"], "rows": {"Revenue": [18120000000.0, 22103000000.0, 26044000000.0, 30040000000.0, 35082000000.0, 39331000000.0, 44062000000.0, 46743000000.0, 57006000000.0, 68127000000.0, 81615000000.0, 96221000000.0], "Cost of revenue": [4720000000.0, 5312000000.0, 5638000000.0, 7466000000.0, 8926000000.0, 10608000000.0, 17394000000.0, 12890000000.0, 15157000000.0, 17034000000.0, 20458000000.0, 24079000000.0], "Gross profit": [13400000000.0, 16791000000.0, 20406000000.0, 22574000000.0, 26156000000.0, 28723000000.0, 26668000000.0, 33853000000.0, 41849000000.0, 51093000000.0, 61157000000.0, 72142000000.0], "R&D": [2294000000.0, 2465000000.0, 2720000000.0, 3090000000.0, 3390000000.0, 3714000000.0, 3989000000.0, 4291000000.0, 4705000000.0, 5512000000.0, 6321000000.0, 7054000000.0], "SG&A": [689000000.0, 712000000.0, 777000000.0, 842000000.0, 897000000.0, 975000000.0, 1041000000.0, 1122000000.0, 1134000000.0, 1282000000.0, 1300000000.0, 1354000000.0], "Operating income": [10417000000.0, 13614000000.0, 16909000000.0, 18642000000.0, 21869000000.0, 24034000000.0, 21638000000.0, 28440000000.0, 36010000000.0, 44299000000.0, 53536000000.0, 63734000000.0], "Net income": [9243000000.0, 12285000000.0, 14881000000.0, 16599000000.0, 19309000000.0, 22091000000.0, 18775000000.0, 26422000000.0, 31910000000.0, 42960000000.0, 58321000000.0, 59688000000.0], "Diluted EPS": [0.37, null, 0.6, 0.67, 0.78, null, 0.76, 1.08, 1.3, null, 2.39, 2.46], "Diluted shares": [24940000000.0, null, 24890000000.0, 24848000000.0, 24774000000.0, null, 24611000000.0, 24532000000.0, 24483000000.0, null, 24391000000.0, 24285000000.0], "Operating cash flow": [7332000000.0, 11499000000.0, 15345000000.0, 14488000000.0, 17627000000.0, 16629000000.0, 27414000000.0, 15365000000.0, 23751000000.0, 36188000000.0, 50344000000.0, 24077000000.0], "Capex": [278000000.0, 254000000.0, 369000000.0, 977000000.0, 813000000.0, 1077000000.0, 1227000000.0, 1895000000.0, 1636000000.0, 1284000000.0, 1757000000.0, 2677000000.0], "Stock-based comp": [979000000.0, 994000000.0, 1011000000.0, 1154000000.0, 1252000000.0, 1321000000.0, 1474000000.0, 1624000000.0, 1655000000.0, 1633000000.0, 1928000000.0, 2027000000.0], "D&A": [372000000.0, 387000000.0, 410000000.0, 433000000.0, 478000000.0, 543000000.0, 611000000.0, 669000000.0, 751000000.0, 812000000.0, 997000000.0, 1127000000.0], "Depreciation": [null, null, null, null, null, null, null, null, null, null, null, null], "Amortization of intangibles": [144000000.0, 143000000.0, 143000000.0, 146000000.0, 149000000.0, 155000000.0, 159000000.0, 84000000.0, 96000000.0, 150000000.0, 232000000.0, 237000000.0], "Buybacks": [3807000000.0, 2659000000.0, 7740000000.0, 7158000000.0, 10997000000.0, 7811000000.0, 14095000000.0, 9720000000.0, 12456000000.0, 3815000000.0, 19312000000.0, 19732000000.0], "Dividends paid": [99000000.0, 99000000.0, 98000000.0, 246000000.0, 245000000.0, 245000000.0, 244000000.0, 244000000.0, 244000000.0, 242000000.0, 243000000.0, 6000000000.0], "Cash & equivalents": [5519000000.0, 7280000000.0, 7587000000.0, 8563000000.0, 9107000000.0, 8589000000.0, 15234000000.0, 11639000000.0, 11486000000.0, 10605000000.0, 13237000000.0, 22443000000.0], "Short-term investments": [12762000000.0, 18704000000.0, 23851000000.0, 26237000000.0, 29380000000.0, 34621000000.0, 38457000000.0, 45152000000.0, 49122000000.0, 39065000000.0, 37098000000.0, 34143000000.0], "Total assets": [54148000000.0, 65728000000.0, 77072000000.0, 85227000000.0, 96013000000.0, 111601000000.0, 125254000000.0, 140740000000.0, 161148000000.0, 206803000000.0, 259474000000.0, 320272000000.0], "Total liabilities": [20883000000.0, 22750000000.0, 27930000000.0, 27070000000.0, 30114000000.0, 32274000000.0, 41411000000.0, 40609000000.0, 42251000000.0, 49510000000.0, 64000000000.0, 91288000000.0], "Long-term debt": [8457000000.0, 8459000000.0, 8460000000.0, 8461000000.0, 8462000000.0, 8463000000.0, 8464000000.0, 8466000000.0, 7468000000.0, 7469000000.0, 7470000000.0, 32366000000.0], "Deferred revenue (current)": [513000000.0, 764000000.0, 845000000.0, 948000000.0, 752000000.0, 837000000.0, 1074000000.0, 980000000.0, 1248000000.0, 1379000000.0, 1714000000.0, 4616000000.0], "Shareholders' equity": [33265000000.0, 42978000000.0, 49142000000.0, 58157000000.0, 65899000000.0, 79327000000.0, 83843000000.0, 100131000000.0, 118897000000.0, 157293000000.0, 195474000000.0, 228984000000.0], "Free cash flow": [7054000000.0, 11245000000.0, 14976000000.0, 13511000000.0, 16814000000.0, 15552000000.0, 26187000000.0, 13470000000.0, 22115000000.0, 34904000000.0, 48587000000.0, 21400000000.0], "FCF after SBC": [6075000000.0, 10251000000.0, 13965000000.0, 12357000000.0, 15562000000.0, 14231000000.0, 24713000000.0, 11846000000.0, 20460000000.0, 33271000000.0, 46659000000.0, 19373000000.0], "Net cash (debt)": [9824000000.0, 17525000000.0, 22978000000.0, 26339000000.0, 30025000000.0, 34747000000.0, 45227000000.0, 48325000000.0, 53140000000.0, 42201000000.0, 42865000000.0, 24220000000.0], "Revenue growth YoY %": [205.5134041476985, 265.27846636919514, 262.1245828698554, 122.40319834160064, 93.60927152317882, 77.9441704745962, 69.18292121025955, 55.60252996005326, 62.49358645459211, 73.21451272533118, 85.22763378875223, 105.85114348672526], "Gross margin %": [73.9514348785872, 75.9670632945754, 78.35201965903855, 75.14647137150466, 74.55675275069837, 73.02890849457171, 60.52380736235305, 72.4236784117408, 73.41157071185489, 74.99669734466511, 74.9335293757275, 74.97531723844068], "Operating margin %": [57.48896247240618, 61.59344885309687, 64.92474274305022, 62.0572569906791, 62.33681090017673, 61.10701482291322, 49.10807498524806, 60.84333483088377, 63.16878925025436, 65.02414608011507, 65.59578508852539, 66.23710000935347], "R&D % of revenue": [12.660044150110375, 11.15233226258879, 10.443864229765012, 10.286284953395473, 9.663075081238242, 9.442933055350741, 9.053152376197177, 9.17998416875254, 8.253517173630847, 8.09077164707091, 7.744899834589231, 7.331040001662839], "SBC % of revenue": [5.402869757174393, 4.497127086820794, 3.8818921824604518, 3.841544607190413, 3.5687817114189615, 3.3586738196333683, 3.3452861876446827, 3.4743170100335883, 2.903203171595972, 2.396993849721843, 2.362310849721252, 2.106608744452874], "FCF margin %": [38.92935982339956, 50.87544677193141, 57.50268775917677, 44.976697736351525, 47.92771221709138, 39.54132872289034, 59.43216376923426, 28.81714909184263, 38.79416201803319, 51.23372524843307, 59.53194878392453, 22.240467257667245]}}, "comps": [{"ticker": "NVDA", "Company": "NVIDIA", "Price": 202.05999755859375, "Market cap ($M)": 4869645.941162109, "Enterprise value ($M)": 4845425.941162109, "TTM revenue ($M)": 302969.0, "Revenue growth TTM %": 83.37529809100704, "Gross margin TTM %": 74.67463667900016, "Operating margin TTM %": 65.21426284537361, "P/E TTM": 25.24715464701761, "EV/Revenue TTM": 15.993141018262955, "EV/EBITDA TTM": 24.07473662298704, "FCF yield TTM %": 2.6081156933083074, "52w high": 239.24000549316406, "52w low": 164.79331970214844, "1y return %": -2.0958499541834597}, {"ticker": "AMD", "Company": "Advanced Micro Devices", "Price": 466.8399963378906, "Market cap ($M)": 762104.6426289778, "Enterprise value ($M)": 751344.6426289778, "TTM revenue ($M)": 41305.0, "Revenue growth TTM %": 39.54391891891893, "Gross margin TTM %": 53.20421256506476, "Operating margin TTM %": 15.707541459871685, "P/E TTM": 118.44958697994682, "EV/Revenue TTM": 18.190162029511626, "EV/EBITDA TTM": 80.51271352646569, "FCF yield TTM %": 1.1026044889337996, "52w high": 649.4199829101562, "52w low": 190.9499969482422, "1y return %": 79.79588188398243}, {"ticker": "AVGO", "Company": "Broadcom", "Price": 322.2300109863281, "Market cap ($M)": 1538206.803843614, "Enterprise value ($M)": 1571398.803843614, "TTM revenue ($M)": 89104.0, "Revenue growth TTM %": 48.69005106297768, "Gross margin TTM %": 68.7702011133058, "Operating margin TTM %": 48.04947028191776, "P/E TTM": 40.19879273078829, "EV/Revenue TTM": 17.635558491690766, "EV/EBITDA TTM": 30.54818825512469, "FCF yield TTM %": 2.561619146498458, "52w high": 479.93511962890625, "52w low": 292.41387939453125, "1y return %": -10.460376118160596}, {"ticker": "INTC", "Company": "Intel", "Price": 59.970001220703125, "Market cap ($M)": 318740.5564880371, "Enterprise value ($M)": 311052.5564880371, "TTM revenue ($M)": 59892.0, "Revenue growth TTM %": 12.075450513669782, "Gross margin TTM %": 39.89681426567822, "Operating margin TTM %": 2.94196219862419, "P/E TTM": null, "EV/Revenue TTM": 5.193557678622138, "EV/EBITDA TTM": 21.629410784231773, "FCF yield TTM %": 1.1821526703463041, "52w high": 140.94000244140625, "52w low": 33.619998931884766, "1y return %": 51.82278790051424}, {"ticker": "QCOM", "Company": "Qualcomm", "Price": 162.0800018310547, "Market cap ($M)": 170184.00192260742, "Enterprise value ($M)": 174661.00192260742, "TTM revenue ($M)": 44069.0, "Revenue growth TTM %": 1.8771528307557128, "Gross margin TTM %": 54.226326896457834, "Operating margin TTM %": 23.188636002632236, "P/E TTM": 18.38038685847364, "EV/Revenue TTM": 3.963352967451211, "EV/EBITDA TTM": 14.81182173699181, "FCF yield TTM %": 6.120434284261785, "52w high": 248.7425079345703, "52w low": 122.94430541992188, "1y return %": -8.44661497927609}, {"ticker": "TXN", "Company": "Texas Instruments", "Price": 302.0199890136719, "Market cap ($M)": 275976.90079933946, "Enterprise value ($M)": 280739.90079933946, "TTM revenue ($M)": 20766.0, "Revenue growth TTM %": 20.271052936406807, "Gross margin TTM %": 60.242704420687666, "Operating margin TTM %": 40.76374843494173, "P/E TTM": 38.798945704954235, "EV/Revenue TTM": 13.519209322899908, "EV/EBITDA TTM": 26.32101076311077, "FCF yield TTM %": 2.651671201033183, "52w high": 328.9816589355469, "52w low": 150.06103515625, "1y return %": 91.13044317945895}, {"ticker": "MU", "Company": "Micron Technology", "Price": 833.5900268554688, "Market cap ($M)": 943143.1056759807, "Enterprise value ($M)": 902501.1056759807, "TTM revenue ($M)": 133188.0, "Revenue growth TTM %": 256.3272513243084, "Gross margin TTM %": 80.71598041865633, "Operating margin TTM %": 74.58629906598192, "P/E TTM": 11.09984942362486, "EV/Revenue TTM": 6.776144289845787, "EV/EBITDA TTM": 8.291769849011702, "FCF yield TTM %": 6.251755395883357, "52w high": 1213.1824951171875, "52w low": 201.1415557861328, "1y return %": 255.57592949840506}, {"ticker": "MRVL", "Company": "Marvell Technology", "Price": 171.41000366210938, "Market cap ($M)": 150309.4322113037, "Enterprise value ($M)": 151339.5322113037, "TTM revenue ($M)": 9450.3, "Revenue growth TTM %": 30.62101756762361, "Gross margin TTM %": 52.21104091933589, "Operating margin TTM %": 16.52116864014899, "P/E TTM": 56.93754771442241, "EV/Revenue TTM": 16.014256924256767, "EV/EBITDA TTM": 56.13692355476973, "FCF yield TTM %": 1.151025570749173, "52w high": 316.2828369140625, "52w low": 73.65884399414062, "1y return %": 89.99563299426742}], "secUrl": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=1045810&type=10-K"};
+const $ = (id) => document.getElementById(id);
+const S = D.snap || {};
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+const TAGS = {F: "FACT", M: "MGMT", I: "VIEW"};
+
+// ---------- formatting ----------
+function money(v, unitM = false) {
+  if (v == null) return "–";
+  const x = unitM ? v * 1e6 : v, a = Math.abs(x), s = x < 0 ? "-" : "";
+  if (a >= 1e12) return s + "$" + (a / 1e12).toFixed(2) + "T";
+  if (a >= 1e9) return s + "$" + (a / 1e9).toFixed(a >= 1e11 || a % 1e9 === 0 ? 0 : 1) + "B";
+  if (a >= 1e6) return s + "$" + (a / 1e6).toFixed(0) + "M";
+  if (a === 0) return "$0";
+  return s + "$" + a.toFixed(2);
+}
+const pct = (v, d = 1) => v == null ? "–" : v.toFixed(d) + "%";
+const mult = (v) => v == null ? "–" : v.toFixed(1) + "x";
+const qLabel = (iso) => { const d = new Date(iso + "T00:00:00"); return d.toLocaleString("en-US", {month: "short"}) + " '" + String(d.getFullYear()).slice(2); };
+const fyLabel = (p) => p.split(" ")[0];
+const Q = D.quarterly, A = D.annual;
+const qrow = (m) => Q.rows[m] || Q.periods.map(() => null);
+
+// ---------- chart kit ----------
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs, parent) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+function niceTicks(lo, hi, n = 4) {
+  if (lo === hi) { hi = lo + 1; }
+  const span = hi - lo, step0 = span / n, mag = Math.pow(10, Math.floor(Math.log10(step0)));
+  const step = [1, 2, 2.5, 5, 10].map((m) => m * mag).find((s) => (Math.ceil(hi / s) - Math.floor(lo / s)) <= n + 1) || 10 * mag;
+  // Ends are rounded outward so every value sits inside the axis.
+  const start = Math.floor(lo / step) * step, end = Math.ceil(hi / step - 1e-9) * step;
+  const t = []; for (let v = start; v <= end + step * 1e-9; v += step) t.push(+v.toFixed(10));
+  return t;
+}
+function frame(host, {h = 230, left = 52, right = 16, top = 14, bottom = 26} = {}) {
+  host.innerHTML = "";
+  const w = Math.max(280, host.clientWidth || 600);
+  const svg = el("svg", {viewBox: `0 0 ${w} ${h}`, role: "img"}, host);
+  const tip = document.createElement("div"); tip.className = "tip"; tip.hidden = true; host.appendChild(tip);
+  return {svg, tip, w, h, x0: left, x1: w - right, y0: h - bottom, y1: top};
+}
+function yAxis(f, ticks, y, fmt) {
+  const g = el("g", {class: "grid"}, f.svg);
+  ticks.forEach((t) => {
+    el("line", {x1: f.x0, x2: f.x1, y1: y(t), y2: y(t)}, g);
+    el("text", {x: f.x0 - 8, y: y(t) + 4, "text-anchor": "end"}, f.svg).textContent = fmt(t);
+  });
+}
+function xLabels(f, labels, xc, every) {
+  // Count back from the latest period so the newest label always shows and nothing collides.
+  labels.forEach((l, i) => { if ((labels.length - 1 - i) % every === 0) el("text", {x: xc(i), y: f.h - 6, "text-anchor": "middle"}, f.svg).textContent = l; });
+}
+function showTip(f, html, x, y) { f.tip.innerHTML = html; f.tip.hidden = false; const half = f.tip.offsetWidth / 2; f.tip.style.left = Math.min(Math.max(x, half), f.w - half) + "px"; f.tip.style.top = y + "px"; }
+const hideTip = (f) => { f.tip.hidden = true; };
+const scaleY = (f, lo, hi) => (v) => f.y0 - (v - lo) / (hi - lo) * (f.y0 - f.y1);
+const every = (n, w) => Math.max(1, Math.ceil(n / Math.max(3, Math.floor(w / 70))));
+
+// rounded-top bar path anchored on the baseline
+function barPath(x, w, yTop, yBase, r = 4) {
+  if (yTop > yBase) { [yTop, yBase] = [yBase, yTop]; r = 0; }
+  r = Math.min(r, w / 2, yBase - yTop);
+  return `M${x},${yBase}V${yTop + r}Q${x},${yTop} ${x + r},${yTop}H${x + w - r}Q${x + w},${yTop} ${x + w},${yTop + r}V${yBase}Z`;
+}
+
+function bars(host, labels, series, {fmt, tipFn} = {}) {
+  const f = frame(host);
+  const all = series.flatMap((s) => s.values).filter((v) => v != null);
+  const ticks = niceTicks(Math.min(0, ...all), Math.max(...all));
+  const lo = ticks[0], hi = ticks[ticks.length - 1], y = scaleY(f, lo, hi);
+  yAxis(f, ticks, y, fmt);
+  const n = labels.length, slot = (f.x1 - f.x0) / n, gap = 2;
+  const bw = Math.min(34, (slot * 0.72 - gap * (series.length - 1)) / series.length);
+  const groupW = bw * series.length + gap * (series.length - 1);
+  const xc = (i) => f.x0 + slot * i + slot / 2;
+  const marks = [];
+  series.forEach((s, k) => s.values.forEach((v, i) => {
+    if (v == null) return;
+    const x = xc(i) - groupW / 2 + k * (bw + gap);
+    marks.push([i, el("path", {d: barPath(x, bw, y(v), y(0)), fill: s.color, class: "bar"}, f.svg)]);
+  }));
+  if (lo < 0) el("line", {x1: f.x0, x2: f.x1, y1: y(0), y2: y(0), stroke: "var(--ink-2)"}, f.svg);
+  xLabels(f, labels, xc, every(n, f.w));
+  for (let i = 0; i < n; i++) {
+    const hit = el("rect", {x: f.x0 + slot * i, y: f.y1, width: slot, height: f.y0 - f.y1, fill: "transparent"}, f.svg);
+    hit.addEventListener("pointerenter", () => {
+      marks.forEach(([j, m]) => m.style.opacity = j === i ? 1 : .35);
+      const top = Math.min(...series.map((s) => s.values[i] == null ? Infinity : y(Math.max(0, s.values[i]))));
+      showTip(f, tipFn(i), xc(i), isFinite(top) ? top : f.y1);
+    });
+    hit.addEventListener("pointerleave", () => { marks.forEach(([, m]) => m.style.opacity = 1); hideTip(f); });
+  }
+}
+
+function lines(host, labels, series, {fmt, lo, hi, tipFn, area, endLabels = true} = {}) {
+  const f = frame(host, {right: endLabels ? 46 : 16});
+  const all = series.flatMap((s) => s.values).filter((v) => v != null);
+  const ticks = niceTicks(lo ?? Math.min(...all), hi ?? Math.max(...all));
+  const y = scaleY(f, ticks[0], ticks[ticks.length - 1]);
+  yAxis(f, ticks, y, fmt);
+  const n = labels.length, xc = (i) => f.x0 + (n === 1 ? 0 : (f.x1 - f.x0) * i / (n - 1));
+  series.forEach((s) => {
+    let d = "", pen = false;
+    s.values.forEach((v, i) => { if (v == null) { pen = false; return; } d += (pen ? "L" : "M") + xc(i).toFixed(1) + "," + y(v).toFixed(1); pen = true; });
+    if (area) {
+      const idx = s.values.map((v, i) => v == null ? null : i).filter((i) => i != null);
+      el("path", {d: d + `L${xc(idx[idx.length - 1])},${f.y0}L${xc(idx[0])},${f.y0}Z`, fill: s.color, opacity: .12}, f.svg);
+    }
+    el("path", {d, fill: "none", stroke: s.color, "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round"}, f.svg);
+    const li = s.values.map((v, i) => v == null ? -1 : i).filter((i) => i >= 0).pop();
+    if (li != null && li >= 0) {
+      el("circle", {cx: xc(li), cy: y(s.values[li]), r: 4, fill: s.color, stroke: "var(--surface)", "stroke-width": 2}, f.svg);
+      if (endLabels) el("text", {x: xc(li) + 8, y: y(s.values[li]) + 4, class: "lbl"}, f.svg).textContent = fmt(s.values[li]);
+    }
+  });
+  xLabels(f, labels, xc, every(n, f.w));
+  const cross = el("line", {y1: f.y1, y2: f.y0, stroke: "var(--muted)", "stroke-dasharray": "3 3", opacity: 0}, f.svg);
+  const dots = series.map((s) => el("circle", {r: 4, fill: s.color, stroke: "var(--surface)", "stroke-width": 2, opacity: 0}, f.svg));
+  const hit = el("rect", {x: f.x0, y: f.y1, width: f.x1 - f.x0, height: f.y0 - f.y1, fill: "transparent"}, f.svg);
+  hit.addEventListener("pointermove", (e) => {
+    const r = f.svg.getBoundingClientRect(), px = (e.clientX - r.left) * f.w / r.width;
+    const i = Math.max(0, Math.min(n - 1, Math.round((px - f.x0) / ((f.x1 - f.x0) / Math.max(1, n - 1)))));
+    cross.setAttribute("x1", xc(i)); cross.setAttribute("x2", xc(i)); cross.setAttribute("opacity", 1);
+    series.forEach((s, k) => { const v = s.values[i]; dots[k].setAttribute("opacity", v == null ? 0 : 1); if (v != null) { dots[k].setAttribute("cx", xc(i)); dots[k].setAttribute("cy", y(v)); } });
+    const top = Math.min(...series.map((s) => s.values[i] == null ? f.y0 : y(s.values[i])));
+    showTip(f, tipFn(i), xc(i) * r.width / f.w, top * r.height / f.h);
+  });
+  hit.addEventListener("pointerleave", () => { cross.setAttribute("opacity", 0); dots.forEach((d) => d.setAttribute("opacity", 0)); hideTip(f); });
+}
+
+function scatter(host, pts, {xfmt, yfmt, xname, yname}) {
+  const f = frame(host, {h: 290, bottom: 40, left: 52, right: 24, top: 28});
+  const xt = niceTicks(Math.min(0, ...pts.map((p) => p.x)), Math.max(...pts.map((p) => p.x)));
+  const yt = niceTicks(0, Math.max(...pts.map((p) => p.y)));
+  const x = (v) => f.x0 + (v - xt[0]) / (xt[xt.length - 1] - xt[0]) * (f.x1 - f.x0), y = scaleY(f, yt[0], yt[yt.length - 1]);
+  yAxis(f, yt, y, yfmt);
+  xt.forEach((t) => el("text", {x: x(t), y: f.y0 + 16, "text-anchor": "middle"}, f.svg).textContent = xfmt(t));
+  el("text", {x: (f.x0 + f.x1) / 2, y: f.h - 4, "text-anchor": "middle", class: "lbl"}, f.svg).textContent = xname;
+  el("text", {x: f.x0, y: 12, "text-anchor": "start", class: "lbl"}, f.svg).textContent = yname + " ↑";
+  // Place labels top-down, pushing a label down when it would overlap one already placed.
+  const placed = [];
+  const labelY = (p) => {
+    const right = x(p.x) < f.x1 - 50, lx = x(p.x) + (right ? 10 : -10), w = p.label.length * 7 + 4;
+    const x0 = right ? lx : lx - w; let ly = y(p.y) + 4;
+    for (let tries = 0; tries < 6; tries++) {
+      const hit = placed.find((b) => x0 < b.x1 && x0 + w > b.x0 && Math.abs(ly - b.y) < 12);
+      if (!hit) break; ly = hit.y + 12;
+    }
+    placed.push({x0, x1: x0 + w, y: ly}); return {lx, ly, right};
+  };
+  const labelPos = new Map([...pts].sort((a, b) => y(a.y) - y(b.y)).map((p) => [p, labelY(p)]));
+  const sorted = [...pts].sort((a, b) => a.me - b.me);
+  sorted.forEach((p) => {
+    const g = el("g", {}, f.svg);
+    el("circle", {cx: x(p.x), cy: y(p.y), r: p.me ? 7 : 5, fill: p.me ? "var(--accent)" : "var(--dot)", stroke: "var(--surface)", "stroke-width": 2, class: "pt"}, g);
+    const {lx, ly, right} = labelPos.get(p);
+    const t = el("text", {x: lx, y: ly, "text-anchor": right ? "start" : "end", class: p.me ? "lbl" : ""}, g);
+    t.textContent = p.label; if (p.me) t.setAttribute("font-weight", 600);
+    const hit = el("circle", {cx: x(p.x), cy: y(p.y), r: 14, fill: "transparent"}, g);
+    hit.addEventListener("pointerenter", () => showTip(f, `<b>${esc(p.label)}</b> ${esc(p.name || "")}<br>${xname}: ${xfmt(p.x)}<br>${yname}: ${yfmt(p.y)}`, x(p.x) * f.svg.getBoundingClientRect().width / f.w, y(p.y) * f.svg.getBoundingClientRect().height / f.h));
+    hit.addEventListener("pointerleave", () => hideTip(f));
+  });
+}
+const legend = (host, items) => { $(host).innerHTML = items.map(([n, c]) => `<span><i style="background:${c}"></i>${esc(n)}</span>`).join(""); };
+
+// ---------- header ----------
+const V = D.val;
+document.title = `${D.ticker} Research Snapshot`;
+$("stamp").textContent = `Generated ${D.generated}`;
+$("eyebrow").textContent = `${D.ticker} · ${D.subsector || "Technology"} · Snapshot ${S.prepared || ""}`;
+$("title").textContent = S.name ? `${S.name} (${D.ticker})` : D.company;
+$("headline").textContent = S.headline || "";
+$("meta").innerHTML = [S.latest_quarter && `Latest quarter: ${esc(S.latest_quarter)}`, S.next_event && `Next: ${esc(S.next_event)}`].filter(Boolean).map((t) => `<span>${t}</span>`).join("");
+$("px").textContent = V.Price != null ? "$" + V.Price.toFixed(2) : "–";
+const r1 = V["1y return %"];
+if (r1 != null) $("chg").outerHTML = `<span class="chg ${r1 >= 0 ? "up" : "down"}">${r1 >= 0 ? "▲" : "▼"} ${Math.abs(r1).toFixed(1)}% 1y</span>`;
+if (V["52w low"] != null) {
+  const pos = (V.Price - V["52w low"]) / (V["52w high"] - V["52w low"]) * 100;
+  $("range").innerHTML = `<span>52-week range</span><div class="bar"><i style="left:${pos.toFixed(1)}%"></i></div><div class="ends"><span>$${V["52w low"].toFixed(2)}</span><span>$${V["52w high"].toFixed(2)}</span></div>`;
+}
+$("quotekv").innerHTML = [["Market cap", money(V["Market cap ($M)"], true)], ["Enterprise value", money(V["Enterprise value ($M)"], true)],
+  ["EV / Revenue (TTM)", mult(V["EV/Revenue TTM"])], ["EV / EBITDA (TTM)", mult(V["EV/EBITDA TTM"])]].map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("");
+$("kpis").innerHTML = [["TTM revenue", money(V["TTM revenue ($M)"], true)], ["Revenue growth", pct(V["Revenue growth TTM %"], 0)],
+  ["Gross margin", pct(V["Gross margin TTM %"])], ["Operating margin", pct(V["Operating margin TTM %"])],
+  ["P/E (TTM)", mult(V["P/E TTM"])], ["FCF yield", pct(V["FCF yield TTM %"])]].map(([l, v]) => `<div class="kpi"><span class="v">${v}</span><span class="l">${l}</span></div>`).join("");
+
+// ---------- narrative ----------
+const item = (x) => `<li><b class="tag ${x.tag}">${TAGS[x.tag] || x.tag}</b><span class="txt">${esc(x.text)}</span>${x.src ? `<span class="src">${esc(x.src)}</span>` : ""}</li>`;
+$("takeaways").innerHTML = (S.takeaways || []).map(item).join("");
+if (S.guidance) $("guidance").innerHTML = `<div class="eyebrow">Management outlook</div><ul class="list">${item(S.guidance)}</ul>`;
+else $("guidance").hidden = true;
+$("biz").innerHTML = (S.business || []).map(item).join("");
+$("why").textContent = S.why_it_matters ? "Why it matters: " + S.why_it_matters : "";
+$("biz-src").textContent = "Latest 10-K and 10-Q";
+$("exposures").innerHTML = (S.exposures || []).map((x) => `<div class="row"><span>${esc(x.label)}</span><b>${esc(x.value)}</b><span class="n">${esc(x.note)} · ${esc(x.src)}</span></div>`).join("");
+$("events").innerHTML = (S.events || []).map((e) => `<li><span class="d">${esc(e.date)}<em>${esc(e.form)}</em></span><span class="t">${esc(e.text)} ${e.url ? `<a href="${esc(e.url)}" target="_blank" rel="noopener">Filing</a>` : ""}</span></li>`).join("");
+$("debate-cards").innerHTML = (S.debates || []).map((d) => `<div class="debate"><h3>${esc(d.q)}</h3><p>${esc(d.detail)}</p></div>`).join("");
+$("questions").innerHTML = (S.questions || []).map((q) => `<li><span>${esc(q)}</span></li>`).join("");
+$("sources").innerHTML = (S.sources || []).map((s) => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.label)}</a></li>`).join("")
+  + `<li>Financial data: SEC XBRL company facts (every value traceable in financials.xlsx)</li><li>Share price: Yahoo Finance via yfinance</li>`;
+$("foot").textContent = `${D.company}. Built from free SEC EDGAR data and Yahoo share prices on ${D.generated}. Personal research for learning purposes; not investment advice. ${V.Sources || ""}`;
+
+// ---------- charts ----------
+function drawCharts() {
+  const ql = Q.periods.map(qLabel);
+  const rev = qrow("Revenue"), g = qrow("Revenue growth YoY %");
+  bars($("ch-rev"), ql, [{name: "Revenue", color: "var(--s1)", values: rev}], {fmt: (v) => money(v),
+    tipFn: (i) => `<b>${ql[i]}</b><br>Revenue ${money(rev[i])}<br>YoY ${pct(g[i], 0)}`});
+
+  const gm = qrow("Gross margin %"), om = qrow("Operating margin %");
+  legend("lg-margin", [["Gross margin", "var(--s1)"], ["Operating margin", "var(--s2)"]]);
+  lines($("ch-margin"), ql, [{name: "Gross", color: "var(--s1)", values: gm}, {name: "Operating", color: "var(--s2)", values: om}],
+    {fmt: (v) => v.toFixed(0) + "%", lo: 0, hi: 100, tipFn: (i) => `<b>${ql[i]}</b><br>Gross ${pct(gm[i])}<br>Operating ${pct(om[i])}`});
+
+  const n8 = Math.min(8, ql.length), sl = (a) => a.slice(-n8), ni = sl(qrow("Net income")), fcf = sl(qrow("Free cash flow")), l8 = sl(ql);
+  legend("lg-cash", [["Net income", "var(--s1)"], ["Free cash flow", "var(--s3)"]]);
+  bars($("ch-cash"), l8, [{name: "Net income", color: "var(--s1)", values: ni}, {name: "FCF", color: "var(--s3)", values: fcf}], {fmt: (v) => money(v),
+    tipFn: (i) => `<b>${l8[i]}</b><br>Net income ${money(ni[i])}<br>Free cash flow ${money(fcf[i])}<br>Cash conversion ${ni[i] && fcf[i] != null ? Math.round(fcf[i] / ni[i] * 100) + "%" : "–"}`});
+  const k = ni.length - 1;
+  if (ni[k] && fcf[k] != null) $("cash-callout").textContent = `Latest quarter: free cash flow was ${Math.round(fcf[k] / ni[k] * 100)}% of net income (${money(fcf[k])} vs ${money(ni[k])}).`;
+
+  const pts = (D.comps || []).filter((c) => c["Revenue growth TTM %"] != null && c["EV/EBITDA TTM"] != null)
+    .map((c) => ({x: c["Revenue growth TTM %"], y: c["EV/EBITDA TTM"], label: c.ticker, name: c.Company, me: c.ticker === D.ticker}));
+  if (pts.length > 1) scatter($("ch-scatter"), pts, {xfmt: (v) => v.toFixed(0) + "%", yfmt: (v) => v.toFixed(0) + "x", xname: "Revenue growth (TTM)", yname: "EV/EBITDA"});
+
+  const P = D.price || [];
+  if (P.length) {
+    const pl = P.map((p) => { const d = new Date(p[0] + "T00:00:00"); return d.toLocaleString("en-US", {month: "short"}) + " '" + String(d.getFullYear()).slice(2); });
+    const pv = P.map((p) => p[1]);
+    $("px-sub").textContent = `Daily close, ${P[0][0]} to ${P[P.length - 1][0]}`;
+    lines($("ch-price"), pl, [{name: D.ticker, color: "var(--accent)", values: pv}], {fmt: (v) => "$" + v.toFixed(0), area: true,
+      tipFn: (i) => `<b>${P[i][0]}</b><br>$${pv[i].toFixed(2)}`});
+  }
+}
+
+// ---------- tables ----------
+(function compsTable() {
+  const C = [...(D.comps || [])].sort((a, b) => (b["Market cap ($M)"] || 0) - (a["Market cap ($M)"] || 0));
+  if (!C.length) { $("comps").closest(".tablewrap").hidden = true; return; }
+  $("peer-src").textContent = `${D.subsector} peers · price from Yahoo, fundamentals from SEC (TTM)`;
+  const cols = [["Market cap", (c) => money(c["Market cap ($M)"], true)], ["Rev growth", (c) => pct(c["Revenue growth TTM %"], 0)],
+    ["Gross mgn", (c) => pct(c["Gross margin TTM %"], 0)], ["Op mgn", (c) => pct(c["Operating margin TTM %"], 0)],
+    ["P/E", (c) => mult(c["P/E TTM"])], ["EV/Rev", (c) => mult(c["EV/Revenue TTM"])], ["EV/EBITDA", (c) => mult(c["EV/EBITDA TTM"])],
+    ["FCF yield", (c) => pct(c["FCF yield TTM %"])], ["1y return", (c) => pct(c["1y return %"], 0)]];
+  $("comps").innerHTML = `<thead><tr><th>Company</th>${cols.map(([h]) => `<th>${h}</th>`).join("")}</tr></thead><tbody>`
+    + C.map((c) => `<tr class="${c.ticker === D.ticker ? "me" : ""}"><td><b>${esc(c.ticker)}</b> <span style="color:var(--muted)">${esc((c.Company || "").replace(/,? (INC|CORP|CORPORATION|LTD|HOLDINGS?)\.?$/i, ""))}</span></td>${cols.map(([, fn]) => `<td>${fn(c)}</td>`).join("")}</tr>`).join("") + "</tbody>";
+})();
+
+(function annualTable() {
+  const groups = [
+    ["Income statement", [["Revenue", "m"], ["Revenue growth YoY %", "p"], ["Gross margin %", "p"], ["Operating income", "m"], ["Operating margin %", "p"], ["Net income", "m"], ["Diluted EPS", "e"], ["R&D % of revenue", "p"], ["SBC % of revenue", "p"]]],
+    ["Cash flow", [["Operating cash flow", "m"], ["Capex", "m"], ["Free cash flow", "m"], ["FCF margin %", "p"], ["FCF after SBC", "m"], ["Buybacks", "m"], ["Dividends paid", "m"]]],
+    ["Balance sheet", [["Cash & equivalents", "m"], ["Short-term investments", "m"], ["Long-term debt", "m"], ["Net cash (debt)", "m"], ["Shareholders' equity", "m"]]],
+  ];
+  const f = (v, t) => v == null ? "–" : t === "p" ? v.toFixed(1) + "%" : t === "e" ? "$" + v.toFixed(2) : (v < 0 ? "(" : "") + Math.abs(v / 1e6).toLocaleString("en-US", {maximumFractionDigits: 0}) + (v < 0 ? ")" : "");
+  let h = `<thead><tr><th>Fiscal year</th>${A.periods.map((p) => `<th>${esc(fyLabel(p))}</th>`).join("")}</tr></thead><tbody>`;
+  groups.forEach(([g, rows]) => {
+    h += `<tr class="grp"><td colspan="${A.periods.length + 1}">${g}</td></tr>`;
+    rows.forEach(([m, t]) => { if (!A.rows[m]) return; h += `<tr><td>${esc(m.replace(" %", ""))}</td>${A.rows[m].map((v) => `<td class="${v < 0 ? "neg" : ""}">${f(v, t)}</td>`).join("")}</tr>`; });
+  });
+  $("annual").innerHTML = h + "</tbody>";
+})();
+
+drawCharts();
+let rz; addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(drawCharts, 150); });
+</script>
+
+</body>
+</html>

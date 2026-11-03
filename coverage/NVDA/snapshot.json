@@ -1,0 +1,60 @@
+{
+  "ticker": "NVDA",
+  "name": "NVIDIA",
+  "subsector": "Semiconductors",
+  "prepared": "2026-11-03",
+  "latest_quarter": "Q2 FY2027 (ended Jul 26, 2026)",
+  "next_event": "Q3 FY2027 results, historically late November (not confirmed)",
+  "headline": "Growth is re-accelerating at a $300B+ run rate, but NVIDIA is increasingly financing the buildout itself, and the stock is flat on the year.",
+  "takeaways": [
+    {"tag": "F", "text": "Revenue grew 106% YoY last quarter to $96.2B. YoY growth has risen for four straight quarters, from 56% to 106%.", "src": "SEC XBRL, 10-Q Q2 FY27"},
+    {"tag": "F", "text": "Data Center was $89.0B, about 92% of revenue. Gross margin is about 75% and operating margin about 66%.", "src": "10-Q Q2 FY27, MD&A"},
+    {"tag": "F", "text": "Cash is lagging profit: Q2 free cash flow was $21.4B against $59.7B of net income. DSO rose from 45 to 60 days on extended payment terms.", "src": "CFO commentary Q2 FY27"},
+    {"tag": "F", "text": "NVIDIA guaranteed up to $105B of OpenAI data center lease payments and committed $36B to rent cloud capacity back from partners.", "src": "8-K 2026-08-17; 10-Q Q2 FY27"},
+    {"tag": "I", "text": "At 25x trailing earnings, NVIDIA trades below Broadcom, TI and AMD. The market is not paying for current earnings; the thesis has to explain why.", "src": "Comps, SEC TTM + Yahoo price"}
+  ],
+  "business": [
+    {"tag": "F", "text": "Describes itself as a \"data center scale AI infrastructure company\": GPUs, Grace CPUs, NVLink and InfiniBand/Ethernet networking, full rack-scale systems, and the CUDA software stack.", "src": "10-K FY2026, Item 1"},
+    {"tag": "F", "text": "Two segments: Compute & Networking (Data Center, Automotive) and Graphics (GeForce gaming, RTX workstations).", "src": "10-K FY2026, Item 1"},
+    {"tag": "F", "text": "Within Data Center, Hyperscale was $48.7B (+102% YoY) and AI clouds, industrial & enterprise (ACIE) grew 138%.", "src": "CFO commentary Q2 FY27"},
+    {"tag": "F", "text": "One direct customer was 16% of Q2 revenue. In 1H, three direct customers were 16%, 15% and 13%. One AI lab contributed \"a meaningful amount\" indirectly through cloud providers.", "src": "10-Q Q2 FY27, MD&A"},
+    {"tag": "F", "text": "Fabless: wafers from TSMC and Samsung, memory from SK Hynix, Micron and Samsung, assembly by Hon Hai, Wistron and Fabrinet. The supply chain is \"mainly concentrated in Asia.\"", "src": "10-K FY2026, Item 1"},
+    {"tag": "F", "text": "Named competitors: AMD, Intel, Huawei, Broadcom, and in-house chips at Alphabet, Amazon and Microsoft.", "src": "10-K FY2026, Item 1"}
+  ],
+  "why_it_matters": "NVIDIA is now essentially a single-market company selling to a handful of very large buyers. The stock trades on hyperscaler and AI-lab spending plans more than on its own quarterly beats.",
+  "guidance": {"tag": "M", "text": "Q3 FY27 outlook: revenue $108.0B ±2% (about +12% QoQ, +89% YoY) and gross margin 74.0% ±50bp. Assumes no China Data Center compute revenue.", "src": "Q2 FY27 press release, 8-K 2026-08-26"},
+  "exposures": [
+    {"label": "Supply & capacity commitments", "value": "$279B", "note": "Up from $119B one quarter earlier", "src": "10-Q Q2 FY27, MD&A"},
+    {"label": "OpenAI lease guarantees (Ohio, ~4.25 GW)", "value": "$105B cap", "note": "Pays the shortfall if OpenAI defaults; payments expected from 2028", "src": "8-K 2026-08-17"},
+    {"label": "Cloud capacity bought back from partners", "value": "$36B", "note": "Typically 6-year commitments under the new AI cloud partner model", "src": "10-Q Q2 FY27, MD&A"},
+    {"label": "Accounts receivable", "value": "$63.1B", "note": "DSO 60 days, up from 45 one quarter earlier", "src": "CFO commentary Q2 FY27"},
+    {"label": "Third-party AI financing platforms (MOUs)", "value": ">$500B", "note": "Preliminary; NVIDIA may give limited residual-value support", "src": "10-Q Q2 FY27, MD&A"}
+  ],
+  "events": [
+    {"date": "2026-09-03", "form": "8-K", "text": "Agreed to acquire Hugging Face for about $11.9B, plus up to $1.0B in retention equity.", "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000078/nvda-20260902.htm"},
+    {"date": "2026-08-26", "form": "10-Q / 8-K", "text": "Q2 FY27 results: revenue $96.2B, Q3 guide $108B. Vera Rubin began production shipments in Q3.", "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000075/nvda-20260726.htm"},
+    {"date": "2026-08-17", "form": "8-K", "text": "Residual value guarantees on OpenAI-tenanted data center leases with SB Energy, capped at $105B, with an option on about 3.8 GW more.", "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000069/nvda-20260817.htm"},
+    {"date": "2026-07-02", "form": "8-K", "text": "Hired Nicholas Parker, 26 years at Microsoft, as EVP Worldwide Field Operations.", "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000060/nvda-20260628.htm"},
+    {"date": "2026-02-25", "form": "10-K", "text": "FY2026 annual report: revenue $215.9B (+65%), including a $4.5B H20 inventory charge after China export rules changed.", "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm"}
+  ],
+  "debates": [
+    {"q": "Is NVIDIA financing its own demand?", "detail": "Lease guarantees, cloud buy-backs, longer payment terms and a $500B+ financing platform. How much revenue depends on NVIDIA's balance sheet, and what happens if a large AI lab can't pay?"},
+    {"q": "How long can customer spending last?", "detail": "Growth depends on a few hyperscalers and AI labs. Their capex guidance and their own AI revenue are the leading indicators."},
+    {"q": "Will custom chips cap share or margins?", "detail": "Broadcom and Marvell build hyperscalers' in-house accelerators. Watch whether NVIDIA's 75% gross margin holds as those ramp."},
+    {"q": "Are $279B of commitments confidence or inventory risk?", "detail": "The FY26 $4.5B H20 charge showed how quickly commitments become write-downs when demand shifts."},
+    {"q": "Is China an option or a zero?", "detail": "Data Center China revenue is effectively zero and excluded from guidance. Any return is upside; the question is whether the market already assumes none."}
+  ],
+  "questions": [
+    "NVIDIA trades at 25x trailing earnings while growing 100%+. Is the market right to be skeptical? What would make 25x expensive?",
+    "Do the OpenAI guarantee and extended payment terms worry you, or are they normal for a dominant supplier? Compare Cisco and Lucent's vendor financing in 1999-2000.",
+    "Which single KPI would tell you whether the bull or bear case is winning: Data Center growth, gross margin, DSO and cash conversion, or customer concentration?"
+  ],
+  "sources": [
+    {"label": "10-K FY2026 (filed 2026-02-25)", "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm"},
+    {"label": "10-Q Q2 FY2027 (filed 2026-08-26)", "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000075/nvda-20260726.htm"},
+    {"label": "8-K Q2 results, press release and CFO commentary (2026-08-26)", "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000073/"},
+    {"label": "8-K SB Energy / OpenAI guarantees (2026-08-17)", "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000069/nvda-20260817.htm"},
+    {"label": "8-K Hugging Face acquisition (2026-09-03)", "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000078/nvda-20260902.htm"},
+    {"label": "8-K executive appointment (2026-07-02)", "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000060/nvda-20260628.htm"}
+  ]
+}

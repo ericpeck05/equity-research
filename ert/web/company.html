@@ -1,0 +1,365 @@
+<title>__TICKER__ Research Snapshot</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+/*__CSS__*/
+</style>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="index.html">Coverage Desk</a>
+    <nav aria-label="Sections">
+      <a href="#numbers">Numbers</a><a href="#business">Business</a><a href="#valuation">Valuation</a>
+      <a href="#debates">Debates</a><a href="#financials">Financials</a>
+    </nav>
+    <span class="spacer"></span>
+    <span class="stamp" id="stamp"></span>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div>
+      <div class="eyebrow" id="eyebrow"></div>
+      <h1 id="title"></h1>
+      <p class="lede" id="headline"></p>
+      <div class="meta" id="meta"></div>
+    </div>
+    <aside class="quote" aria-label="Quote">
+      <div class="eyebrow">Last close</div>
+      <div class="px"><b id="px"></b><span id="chg"></span></div>
+      <div class="range" id="range"></div>
+      <dl class="kv" id="quotekv"></dl>
+    </aside>
+  </section>
+
+  <div class="kpis" id="kpis"></div>
+
+  <section class="section">
+    <div class="section-head"><h2>Key takeaways</h2>
+      <div class="keyline"><span><b class="tag F">FACT</b> from a filing</span><span><b class="tag M">MGMT</b> management's claim</span><span><b class="tag I">VIEW</b> analyst inference</span></div>
+    </div>
+    <div class="grid">
+      <div class="panel c8"><ul class="list" id="takeaways"></ul></div>
+      <div class="panel c4" id="guidance"></div>
+    </div>
+  </section>
+
+  <section class="section" id="numbers">
+    <div class="section-head"><h2>The numbers</h2><span class="eyebrow">Last 12 quarters · SEC XBRL</span></div>
+    <div class="grid">
+      <div class="panel c7"><h3>Quarterly revenue</h3><p class="sub">Hover a bar for year-over-year growth</p><div class="chart" id="ch-rev"></div></div>
+      <div class="panel c5"><h3>Margins</h3><div class="legend" id="lg-margin"></div><div class="chart" id="ch-margin"></div></div>
+      <div class="panel c7"><h3>Profit vs. cash</h3><p class="sub">Net income against free cash flow (operating cash flow minus capex)</p><div class="legend" id="lg-cash"></div><div class="chart" id="ch-cash"></div><div class="callout" id="cash-callout"></div></div>
+      <div class="panel c5"><h3>Commitments and exposures</h3><p class="sub">Obligations that sit outside the income statement</p><div class="exp" id="exposures"></div></div>
+    </div>
+  </section>
+
+  <section class="section" id="business">
+    <div class="section-head"><h2>Business</h2><span class="eyebrow" id="biz-src"></span></div>
+    <div class="grid">
+      <div class="panel c7"><ul class="list" id="biz"></ul><p class="callout prose" id="why"></p></div>
+      <div class="panel c5"><h3>Recent filings and events</h3><ul class="timeline" id="events"></ul></div>
+    </div>
+  </section>
+
+  <section class="section" id="valuation">
+    <div class="section-head"><h2>Valuation vs. peers</h2><span class="eyebrow" id="peer-src"></span></div>
+    <div class="grid">
+      <div class="panel c6"><h3>What the market pays for growth</h3><p class="sub">EV/EBITDA (TTM) against revenue growth (TTM)</p><div class="chart" id="ch-scatter"></div></div>
+      <div class="panel c6"><h3>Share price, 1 year</h3><p class="sub" id="px-sub"></p><div class="chart" id="ch-price"></div></div>
+      <div class="c12 tablewrap"><table id="comps"></table></div>
+    </div>
+  </section>
+
+  <section class="section" id="debates">
+    <div class="section-head"><h2>What the market is debating</h2><span class="eyebrow"><b class="tag I">VIEW</b> analyst inference</span></div>
+    <div class="debates" id="debate-cards"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h2>Questions to answer before going deeper</h2></div>
+    <div class="panel"><ol class="qs" id="questions"></ol></div>
+  </section>
+
+  <section class="section" id="financials">
+    <div class="section-head"><h2>Annual financials</h2><span class="eyebrow">$ millions except per share and % · fiscal years</span></div>
+    <div class="tablewrap"><table id="annual"></table></div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h2>Sources</h2></div>
+    <ul class="sources" id="sources"></ul>
+  </section>
+</main>
+<footer class="wrap" id="foot"></footer>
+
+<script>
+const D = __DATA__;
+const $ = (id) => document.getElementById(id);
+const S = D.snap || {};
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+const TAGS = {F: "FACT", M: "MGMT", I: "VIEW"};
+
+// ---------- formatting ----------
+function money(v, unitM = false) {
+  if (v == null) return "–";
+  const x = unitM ? v * 1e6 : v, a = Math.abs(x), s = x < 0 ? "-" : "";
+  if (a >= 1e12) return s + "$" + (a / 1e12).toFixed(2) + "T";
+  if (a >= 1e9) return s + "$" + (a / 1e9).toFixed(a >= 1e11 || a % 1e9 === 0 ? 0 : 1) + "B";
+  if (a >= 1e6) return s + "$" + (a / 1e6).toFixed(0) + "M";
+  if (a === 0) return "$0";
+  return s + "$" + a.toFixed(2);
+}
+const pct = (v, d = 1) => v == null ? "–" : v.toFixed(d) + "%";
+const mult = (v) => v == null ? "–" : v.toFixed(1) + "x";
+const qLabel = (iso) => { const d = new Date(iso + "T00:00:00"); return d.toLocaleString("en-US", {month: "short"}) + " '" + String(d.getFullYear()).slice(2); };
+const fyLabel = (p) => p.split(" ")[0];
+const Q = D.quarterly, A = D.annual;
+const qrow = (m) => Q.rows[m] || Q.periods.map(() => null);
+
+// ---------- chart kit ----------
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs, parent) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+function niceTicks(lo, hi, n = 4) {
+  if (lo === hi) { hi = lo + 1; }
+  const span = hi - lo, step0 = span / n, mag = Math.pow(10, Math.floor(Math.log10(step0)));
+  const step = [1, 2, 2.5, 5, 10].map((m) => m * mag).find((s) => (Math.ceil(hi / s) - Math.floor(lo / s)) <= n + 1) || 10 * mag;
+  // Ends are rounded outward so every value sits inside the axis.
+  const start = Math.floor(lo / step) * step, end = Math.ceil(hi / step - 1e-9) * step;
+  const t = []; for (let v = start; v <= end + step * 1e-9; v += step) t.push(+v.toFixed(10));
+  return t;
+}
+function frame(host, {h = 230, left = 52, right = 16, top = 14, bottom = 26} = {}) {
+  host.innerHTML = "";
+  const w = Math.max(280, host.clientWidth || 600);
+  const svg = el("svg", {viewBox: `0 0 ${w} ${h}`, role: "img"}, host);
+  const tip = document.createElement("div"); tip.className = "tip"; tip.hidden = true; host.appendChild(tip);
+  return {svg, tip, w, h, x0: left, x1: w - right, y0: h - bottom, y1: top};
+}
+function yAxis(f, ticks, y, fmt) {
+  const g = el("g", {class: "grid"}, f.svg);
+  ticks.forEach((t) => {
+    el("line", {x1: f.x0, x2: f.x1, y1: y(t), y2: y(t)}, g);
+    el("text", {x: f.x0 - 8, y: y(t) + 4, "text-anchor": "end"}, f.svg).textContent = fmt(t);
+  });
+}
+function xLabels(f, labels, xc, every) {
+  // Count back from the latest period so the newest label always shows and nothing collides.
+  labels.forEach((l, i) => { if ((labels.length - 1 - i) % every === 0) el("text", {x: xc(i), y: f.h - 6, "text-anchor": "middle"}, f.svg).textContent = l; });
+}
+function showTip(f, html, x, y) { f.tip.innerHTML = html; f.tip.hidden = false; const half = f.tip.offsetWidth / 2; f.tip.style.left = Math.min(Math.max(x, half), f.w - half) + "px"; f.tip.style.top = y + "px"; }
+const hideTip = (f) => { f.tip.hidden = true; };
+const scaleY = (f, lo, hi) => (v) => f.y0 - (v - lo) / (hi - lo) * (f.y0 - f.y1);
+const every = (n, w) => Math.max(1, Math.ceil(n / Math.max(3, Math.floor(w / 70))));
+
+// rounded-top bar path anchored on the baseline
+function barPath(x, w, yTop, yBase, r = 4) {
+  if (yTop > yBase) { [yTop, yBase] = [yBase, yTop]; r = 0; }
+  r = Math.min(r, w / 2, yBase - yTop);
+  return `M${x},${yBase}V${yTop + r}Q${x},${yTop} ${x + r},${yTop}H${x + w - r}Q${x + w},${yTop} ${x + w},${yTop + r}V${yBase}Z`;
+}
+
+function bars(host, labels, series, {fmt, tipFn} = {}) {
+  const f = frame(host);
+  const all = series.flatMap((s) => s.values).filter((v) => v != null);
+  const ticks = niceTicks(Math.min(0, ...all), Math.max(...all));
+  const lo = ticks[0], hi = ticks[ticks.length - 1], y = scaleY(f, lo, hi);
+  yAxis(f, ticks, y, fmt);
+  const n = labels.length, slot = (f.x1 - f.x0) / n, gap = 2;
+  const bw = Math.min(34, (slot * 0.72 - gap * (series.length - 1)) / series.length);
+  const groupW = bw * series.length + gap * (series.length - 1);
+  const xc = (i) => f.x0 + slot * i + slot / 2;
+  const marks = [];
+  series.forEach((s, k) => s.values.forEach((v, i) => {
+    if (v == null) return;
+    const x = xc(i) - groupW / 2 + k * (bw + gap);
+    marks.push([i, el("path", {d: barPath(x, bw, y(v), y(0)), fill: s.color, class: "bar"}, f.svg)]);
+  }));
+  if (lo < 0) el("line", {x1: f.x0, x2: f.x1, y1: y(0), y2: y(0), stroke: "var(--ink-2)"}, f.svg);
+  xLabels(f, labels, xc, every(n, f.w));
+  for (let i = 0; i < n; i++) {
+    const hit = el("rect", {x: f.x0 + slot * i, y: f.y1, width: slot, height: f.y0 - f.y1, fill: "transparent"}, f.svg);
+    hit.addEventListener("pointerenter", () => {
+      marks.forEach(([j, m]) => m.style.opacity = j === i ? 1 : .35);
+      const top = Math.min(...series.map((s) => s.values[i] == null ? Infinity : y(Math.max(0, s.values[i]))));
+      showTip(f, tipFn(i), xc(i), isFinite(top) ? top : f.y1);
+    });
+    hit.addEventListener("pointerleave", () => { marks.forEach(([, m]) => m.style.opacity = 1); hideTip(f); });
+  }
+}
+
+function lines(host, labels, series, {fmt, lo, hi, tipFn, area, endLabels = true} = {}) {
+  const f = frame(host, {right: endLabels ? 46 : 16});
+  const all = series.flatMap((s) => s.values).filter((v) => v != null);
+  const ticks = niceTicks(lo ?? Math.min(...all), hi ?? Math.max(...all));
+  const y = scaleY(f, ticks[0], ticks[ticks.length - 1]);
+  yAxis(f, ticks, y, fmt);
+  const n = labels.length, xc = (i) => f.x0 + (n === 1 ? 0 : (f.x1 - f.x0) * i / (n - 1));
+  series.forEach((s) => {
+    let d = "", pen = false;
+    s.values.forEach((v, i) => { if (v == null) { pen = false; return; } d += (pen ? "L" : "M") + xc(i).toFixed(1) + "," + y(v).toFixed(1); pen = true; });
+    if (area) {
+      const idx = s.values.map((v, i) => v == null ? null : i).filter((i) => i != null);
+      el("path", {d: d + `L${xc(idx[idx.length - 1])},${f.y0}L${xc(idx[0])},${f.y0}Z`, fill: s.color, opacity: .12}, f.svg);
+    }
+    el("path", {d, fill: "none", stroke: s.color, "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round"}, f.svg);
+    const li = s.values.map((v, i) => v == null ? -1 : i).filter((i) => i >= 0).pop();
+    if (li != null && li >= 0) {
+      el("circle", {cx: xc(li), cy: y(s.values[li]), r: 4, fill: s.color, stroke: "var(--surface)", "stroke-width": 2}, f.svg);
+      if (endLabels) el("text", {x: xc(li) + 8, y: y(s.values[li]) + 4, class: "lbl"}, f.svg).textContent = fmt(s.values[li]);
+    }
+  });
+  xLabels(f, labels, xc, every(n, f.w));
+  const cross = el("line", {y1: f.y1, y2: f.y0, stroke: "var(--muted)", "stroke-dasharray": "3 3", opacity: 0}, f.svg);
+  const dots = series.map((s) => el("circle", {r: 4, fill: s.color, stroke: "var(--surface)", "stroke-width": 2, opacity: 0}, f.svg));
+  const hit = el("rect", {x: f.x0, y: f.y1, width: f.x1 - f.x0, height: f.y0 - f.y1, fill: "transparent"}, f.svg);
+  hit.addEventListener("pointermove", (e) => {
+    const r = f.svg.getBoundingClientRect(), px = (e.clientX - r.left) * f.w / r.width;
+    const i = Math.max(0, Math.min(n - 1, Math.round((px - f.x0) / ((f.x1 - f.x0) / Math.max(1, n - 1)))));
+    cross.setAttribute("x1", xc(i)); cross.setAttribute("x2", xc(i)); cross.setAttribute("opacity", 1);
+    series.forEach((s, k) => { const v = s.values[i]; dots[k].setAttribute("opacity", v == null ? 0 : 1); if (v != null) { dots[k].setAttribute("cx", xc(i)); dots[k].setAttribute("cy", y(v)); } });
+    const top = Math.min(...series.map((s) => s.values[i] == null ? f.y0 : y(s.values[i])));
+    showTip(f, tipFn(i), xc(i) * r.width / f.w, top * r.height / f.h);
+  });
+  hit.addEventListener("pointerleave", () => { cross.setAttribute("opacity", 0); dots.forEach((d) => d.setAttribute("opacity", 0)); hideTip(f); });
+}
+
+function scatter(host, pts, {xfmt, yfmt, xname, yname}) {
+  const f = frame(host, {h: 290, bottom: 40, left: 52, right: 24, top: 28});
+  const xt = niceTicks(Math.min(0, ...pts.map((p) => p.x)), Math.max(...pts.map((p) => p.x)));
+  const yt = niceTicks(0, Math.max(...pts.map((p) => p.y)));
+  const x = (v) => f.x0 + (v - xt[0]) / (xt[xt.length - 1] - xt[0]) * (f.x1 - f.x0), y = scaleY(f, yt[0], yt[yt.length - 1]);
+  yAxis(f, yt, y, yfmt);
+  xt.forEach((t) => el("text", {x: x(t), y: f.y0 + 16, "text-anchor": "middle"}, f.svg).textContent = xfmt(t));
+  el("text", {x: (f.x0 + f.x1) / 2, y: f.h - 4, "text-anchor": "middle", class: "lbl"}, f.svg).textContent = xname;
+  el("text", {x: f.x0, y: 12, "text-anchor": "start", class: "lbl"}, f.svg).textContent = yname + " ↑";
+  // Place labels top-down, pushing a label down when it would overlap one already placed.
+  const placed = [];
+  const labelY = (p) => {
+    const right = x(p.x) < f.x1 - 50, lx = x(p.x) + (right ? 10 : -10), w = p.label.length * 7 + 4;
+    const x0 = right ? lx : lx - w; let ly = y(p.y) + 4;
+    for (let tries = 0; tries < 6; tries++) {
+      const hit = placed.find((b) => x0 < b.x1 && x0 + w > b.x0 && Math.abs(ly - b.y) < 12);
+      if (!hit) break; ly = hit.y + 12;
+    }
+    placed.push({x0, x1: x0 + w, y: ly}); return {lx, ly, right};
+  };
+  const labelPos = new Map([...pts].sort((a, b) => y(a.y) - y(b.y)).map((p) => [p, labelY(p)]));
+  const sorted = [...pts].sort((a, b) => a.me - b.me);
+  sorted.forEach((p) => {
+    const g = el("g", {}, f.svg);
+    el("circle", {cx: x(p.x), cy: y(p.y), r: p.me ? 7 : 5, fill: p.me ? "var(--accent)" : "var(--dot)", stroke: "var(--surface)", "stroke-width": 2, class: "pt"}, g);
+    const {lx, ly, right} = labelPos.get(p);
+    const t = el("text", {x: lx, y: ly, "text-anchor": right ? "start" : "end", class: p.me ? "lbl" : ""}, g);
+    t.textContent = p.label; if (p.me) t.setAttribute("font-weight", 600);
+    const hit = el("circle", {cx: x(p.x), cy: y(p.y), r: 14, fill: "transparent"}, g);
+    hit.addEventListener("pointerenter", () => showTip(f, `<b>${esc(p.label)}</b> ${esc(p.name || "")}<br>${xname}: ${xfmt(p.x)}<br>${yname}: ${yfmt(p.y)}`, x(p.x) * f.svg.getBoundingClientRect().width / f.w, y(p.y) * f.svg.getBoundingClientRect().height / f.h));
+    hit.addEventListener("pointerleave", () => hideTip(f));
+  });
+}
+const legend = (host, items) => { $(host).innerHTML = items.map(([n, c]) => `<span><i style="background:${c}"></i>${esc(n)}</span>`).join(""); };
+
+// ---------- header ----------
+const V = D.val;
+document.title = `${D.ticker} Research Snapshot`;
+$("stamp").textContent = `Generated ${D.generated}`;
+$("eyebrow").textContent = `${D.ticker} · ${D.subsector || "Technology"} · Snapshot ${S.prepared || ""}`;
+$("title").textContent = S.name ? `${S.name} (${D.ticker})` : D.company;
+$("headline").textContent = S.headline || "";
+$("meta").innerHTML = [S.latest_quarter && `Latest quarter: ${esc(S.latest_quarter)}`, S.next_event && `Next: ${esc(S.next_event)}`].filter(Boolean).map((t) => `<span>${t}</span>`).join("");
+$("px").textContent = V.Price != null ? "$" + V.Price.toFixed(2) : "–";
+const r1 = V["1y return %"];
+if (r1 != null) $("chg").outerHTML = `<span class="chg ${r1 >= 0 ? "up" : "down"}">${r1 >= 0 ? "▲" : "▼"} ${Math.abs(r1).toFixed(1)}% 1y</span>`;
+if (V["52w low"] != null) {
+  const pos = (V.Price - V["52w low"]) / (V["52w high"] - V["52w low"]) * 100;
+  $("range").innerHTML = `<span>52-week range</span><div class="bar"><i style="left:${pos.toFixed(1)}%"></i></div><div class="ends"><span>$${V["52w low"].toFixed(2)}</span><span>$${V["52w high"].toFixed(2)}</span></div>`;
+}
+$("quotekv").innerHTML = [["Market cap", money(V["Market cap ($M)"], true)], ["Enterprise value", money(V["Enterprise value ($M)"], true)],
+  ["EV / Revenue (TTM)", mult(V["EV/Revenue TTM"])], ["EV / EBITDA (TTM)", mult(V["EV/EBITDA TTM"])]].map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("");
+$("kpis").innerHTML = [["TTM revenue", money(V["TTM revenue ($M)"], true)], ["Revenue growth", pct(V["Revenue growth TTM %"], 0)],
+  ["Gross margin", pct(V["Gross margin TTM %"])], ["Operating margin", pct(V["Operating margin TTM %"])],
+  ["P/E (TTM)", mult(V["P/E TTM"])], ["FCF yield", pct(V["FCF yield TTM %"])]].map(([l, v]) => `<div class="kpi"><span class="v">${v}</span><span class="l">${l}</span></div>`).join("");
+
+// ---------- narrative ----------
+const item = (x) => `<li><b class="tag ${x.tag}">${TAGS[x.tag] || x.tag}</b><span class="txt">${esc(x.text)}</span>${x.src ? `<span class="src">${esc(x.src)}</span>` : ""}</li>`;
+$("takeaways").innerHTML = (S.takeaways || []).map(item).join("");
+if (S.guidance) $("guidance").innerHTML = `<div class="eyebrow">Management outlook</div><ul class="list">${item(S.guidance)}</ul>`;
+else $("guidance").hidden = true;
+$("biz").innerHTML = (S.business || []).map(item).join("");
+$("why").textContent = S.why_it_matters ? "Why it matters: " + S.why_it_matters : "";
+$("biz-src").textContent = "Latest 10-K and 10-Q";
+$("exposures").innerHTML = (S.exposures || []).map((x) => `<div class="row"><span>${esc(x.label)}</span><b>${esc(x.value)}</b><span class="n">${esc(x.note)} · ${esc(x.src)}</span></div>`).join("");
+$("events").innerHTML = (S.events || []).map((e) => `<li><span class="d">${esc(e.date)}<em>${esc(e.form)}</em></span><span class="t">${esc(e.text)} ${e.url ? `<a href="${esc(e.url)}" target="_blank" rel="noopener">Filing</a>` : ""}</span></li>`).join("");
+$("debate-cards").innerHTML = (S.debates || []).map((d) => `<div class="debate"><h3>${esc(d.q)}</h3><p>${esc(d.detail)}</p></div>`).join("");
+$("questions").innerHTML = (S.questions || []).map((q) => `<li><span>${esc(q)}</span></li>`).join("");
+$("sources").innerHTML = (S.sources || []).map((s) => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.label)}</a></li>`).join("")
+  + `<li>Financial data: SEC XBRL company facts (every value traceable in financials.xlsx)</li><li>Share price: Yahoo Finance via yfinance</li>`;
+$("foot").textContent = `${D.company}. Built from free SEC EDGAR data and Yahoo share prices on ${D.generated}. Personal research for learning purposes; not investment advice. ${V.Sources || ""}`;
+
+// ---------- charts ----------
+function drawCharts() {
+  const ql = Q.periods.map(qLabel);
+  const rev = qrow("Revenue"), g = qrow("Revenue growth YoY %");
+  bars($("ch-rev"), ql, [{name: "Revenue", color: "var(--s1)", values: rev}], {fmt: (v) => money(v),
+    tipFn: (i) => `<b>${ql[i]}</b><br>Revenue ${money(rev[i])}<br>YoY ${pct(g[i], 0)}`});
+
+  const gm = qrow("Gross margin %"), om = qrow("Operating margin %");
+  legend("lg-margin", [["Gross margin", "var(--s1)"], ["Operating margin", "var(--s2)"]]);
+  lines($("ch-margin"), ql, [{name: "Gross", color: "var(--s1)", values: gm}, {name: "Operating", color: "var(--s2)", values: om}],
+    {fmt: (v) => v.toFixed(0) + "%", lo: 0, hi: 100, tipFn: (i) => `<b>${ql[i]}</b><br>Gross ${pct(gm[i])}<br>Operating ${pct(om[i])}`});
+
+  const n8 = Math.min(8, ql.length), sl = (a) => a.slice(-n8), ni = sl(qrow("Net income")), fcf = sl(qrow("Free cash flow")), l8 = sl(ql);
+  legend("lg-cash", [["Net income", "var(--s1)"], ["Free cash flow", "var(--s3)"]]);
+  bars($("ch-cash"), l8, [{name: "Net income", color: "var(--s1)", values: ni}, {name: "FCF", color: "var(--s3)", values: fcf}], {fmt: (v) => money(v),
+    tipFn: (i) => `<b>${l8[i]}</b><br>Net income ${money(ni[i])}<br>Free cash flow ${money(fcf[i])}<br>Cash conversion ${ni[i] && fcf[i] != null ? Math.round(fcf[i] / ni[i] * 100) + "%" : "–"}`});
+  const k = ni.length - 1;
+  if (ni[k] && fcf[k] != null) $("cash-callout").textContent = `Latest quarter: free cash flow was ${Math.round(fcf[k] / ni[k] * 100)}% of net income (${money(fcf[k])} vs ${money(ni[k])}).`;
+
+  const pts = (D.comps || []).filter((c) => c["Revenue growth TTM %"] != null && c["EV/EBITDA TTM"] != null)
+    .map((c) => ({x: c["Revenue growth TTM %"], y: c["EV/EBITDA TTM"], label: c.ticker, name: c.Company, me: c.ticker === D.ticker}));
+  if (pts.length > 1) scatter($("ch-scatter"), pts, {xfmt: (v) => v.toFixed(0) + "%", yfmt: (v) => v.toFixed(0) + "x", xname: "Revenue growth (TTM)", yname: "EV/EBITDA"});
+
+  const P = D.price || [];
+  if (P.length) {
+    const pl = P.map((p) => { const d = new Date(p[0] + "T00:00:00"); return d.toLocaleString("en-US", {month: "short"}) + " '" + String(d.getFullYear()).slice(2); });
+    const pv = P.map((p) => p[1]);
+    $("px-sub").textContent = `Daily close, ${P[0][0]} to ${P[P.length - 1][0]}`;
+    lines($("ch-price"), pl, [{name: D.ticker, color: "var(--accent)", values: pv}], {fmt: (v) => "$" + v.toFixed(0), area: true,
+      tipFn: (i) => `<b>${P[i][0]}</b><br>$${pv[i].toFixed(2)}`});
+  }
+}
+
+// ---------- tables ----------
+(function compsTable() {
+  const C = [...(D.comps || [])].sort((a, b) => (b["Market cap ($M)"] || 0) - (a["Market cap ($M)"] || 0));
+  if (!C.length) { $("comps").closest(".tablewrap").hidden = true; return; }
+  $("peer-src").textContent = `${D.subsector} peers · price from Yahoo, fundamentals from SEC (TTM)`;
+  const cols = [["Market cap", (c) => money(c["Market cap ($M)"], true)], ["Rev growth", (c) => pct(c["Revenue growth TTM %"], 0)],
+    ["Gross mgn", (c) => pct(c["Gross margin TTM %"], 0)], ["Op mgn", (c) => pct(c["Operating margin TTM %"], 0)],
+    ["P/E", (c) => mult(c["P/E TTM"])], ["EV/Rev", (c) => mult(c["EV/Revenue TTM"])], ["EV/EBITDA", (c) => mult(c["EV/EBITDA TTM"])],
+    ["FCF yield", (c) => pct(c["FCF yield TTM %"])], ["1y return", (c) => pct(c["1y return %"], 0)]];
+  $("comps").innerHTML = `<thead><tr><th>Company</th>${cols.map(([h]) => `<th>${h}</th>`).join("")}</tr></thead><tbody>`
+    + C.map((c) => `<tr class="${c.ticker === D.ticker ? "me" : ""}"><td><b>${esc(c.ticker)}</b> <span style="color:var(--muted)">${esc((c.Company || "").replace(/,? (INC|CORP|CORPORATION|LTD|HOLDINGS?)\.?$/i, ""))}</span></td>${cols.map(([, fn]) => `<td>${fn(c)}</td>`).join("")}</tr>`).join("") + "</tbody>";
+})();
+
+(function annualTable() {
+  const groups = [
+    ["Income statement", [["Revenue", "m"], ["Revenue growth YoY %", "p"], ["Gross margin %", "p"], ["Operating income", "m"], ["Operating margin %", "p"], ["Net income", "m"], ["Diluted EPS", "e"], ["R&D % of revenue", "p"], ["SBC % of revenue", "p"]]],
+    ["Cash flow", [["Operating cash flow", "m"], ["Capex", "m"], ["Free cash flow", "m"], ["FCF margin %", "p"], ["FCF after SBC", "m"], ["Buybacks", "m"], ["Dividends paid", "m"]]],
+    ["Balance sheet", [["Cash & equivalents", "m"], ["Short-term investments", "m"], ["Long-term debt", "m"], ["Net cash (debt)", "m"], ["Shareholders' equity", "m"]]],
+  ];
+  const f = (v, t) => v == null ? "–" : t === "p" ? v.toFixed(1) + "%" : t === "e" ? "$" + v.toFixed(2) : (v < 0 ? "(" : "") + Math.abs(v / 1e6).toLocaleString("en-US", {maximumFractionDigits: 0}) + (v < 0 ? ")" : "");
+  let h = `<thead><tr><th>Fiscal year</th>${A.periods.map((p) => `<th>${esc(fyLabel(p))}</th>`).join("")}</tr></thead><tbody>`;
+  groups.forEach(([g, rows]) => {
+    h += `<tr class="grp"><td colspan="${A.periods.length + 1}">${g}</td></tr>`;
+    rows.forEach(([m, t]) => { if (!A.rows[m]) return; h += `<tr><td>${esc(m.replace(" %", ""))}</td>${A.rows[m].map((v) => `<td class="${v < 0 ? "neg" : ""}">${f(v, t)}</td>`).join("")}</tr>`; });
+  });
+  $("annual").innerHTML = h + "</tbody>";
+})();
+
+drawCharts();
+let rz; addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(drawCharts, 150); });
+</script>

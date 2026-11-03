@@ -12,7 +12,7 @@ from SEC filings and can be traced back to the exact filing.
 
 | You say | What happens |
 |---|---|
-| "Snapshot NVDA" | One-page overview: business, 6-year financial trends, valuation, open questions |
+| "Snapshot NVDA" | A research web page: charts of revenue, margins and cash, valuation vs peers, commitments, recent filings, key debates |
 | "Review MSFT's latest 10-K" | Deep read of the annual report with cited notes on drivers, risks and red flags |
 | "What changed in CRWD's risk factors?" | Red-lines this year's filing against last year's and explains what matters |
 | "Comps for semiconductors" | Valuation table for the peer group (P/E, EV/Sales, EV/EBITDA, FCF yield, growth, margins) |
@@ -21,6 +21,13 @@ from SEC filings and can be traced back to the exact filing.
 | "Red team my thesis" / "Mock interview me on my AMD pitch" | A tough PM tears into your work |
 | "Log my call on AMD" / "How's my track record?" | Date-stamped ratings and targets, scored over time |
 
+## The research website
+Every snapshot becomes a page in `docs/`, with a home page listing your coverage and call log.
+Rebuild everything with `python research.py site`. To put it online for free, turn on GitHub Pages:
+repo **Settings → Pages → Deploy from a branch → `main` / `docs`**. It will then be at
+`https://ericpeck05.github.io/equity-research/`, a link you can put on a resume. (Pages from a free
+account are public even if the repo is private.)
+
 ## Where things go
 ```
 coverage/
@@ -28,8 +35,10 @@ coverage/
   calls.csv             every rating/target you've logged
   NVDA/
     financials.xlsx     annual + quarterly financials, with a Sources sheet tracing every number
-    snapshot.md, initiation.md, notes/, diffs/, sections/
+    snapshot.json       the snapshot's content (rendered to docs/NVDA.html)
+    initiation.md, notes/, diffs/, sections/
     thesis_log.md       your dated calls and reasoning (your track record)
+docs/                   the generated research website
 templates/              note formats (initiation, earnings, thesis log)
 .claude/skills/         the research workflows Claude follows
 ```

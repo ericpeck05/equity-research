@@ -12,6 +12,8 @@ Claude does the coding and the data work, the owner does the judgment.
   no paid API.
 - `coverage/<TICKER>/` is where all work on a company lives: financials.xlsx, extracted
   sections, diffs, notes, and `thesis_log.md`.
+- `python research.py site` renders every `coverage/*/snapshot.json` into the website in `docs/`
+  (templates in `ert/web/`). Rebuild it after changing any snapshot.
 - `templates/` has the note formats. `coverage/universe.csv` is the tech coverage universe.
 
 ## Research rules (follow on every task)
