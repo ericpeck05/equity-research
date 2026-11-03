@@ -3,5 +3,5 @@ beautifulsoup4>=4.12
 lxml>=5.0
 pandas>=2.1
 openpyxl>=3.1
-yfinance>=0.2.40
+yfinance>=0.2.40   # share prices only
 pytest>=8.0

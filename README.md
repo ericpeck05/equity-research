@@ -5,7 +5,8 @@ companies. **You don't need to code.** You talk to Claude Code; Claude runs the 
 reads the filings and drafts the work. You make the calls.
 
 Costs nothing beyond your Claude subscription: data comes from SEC EDGAR (free, official)
-and Yahoo Finance (free, unofficial). No API keys.
+and Yahoo Finance (share prices only). No API keys. Every number except the price comes
+from SEC filings and can be traced back to the exact filing.
 
 ## What you can say to Claude
 
@@ -14,7 +15,7 @@ and Yahoo Finance (free, unofficial). No API keys.
 | "Snapshot NVDA" | One-page overview: business, 6-year financial trends, valuation, open questions |
 | "Review MSFT's latest 10-K" | Deep read of the annual report with cited notes on drivers, risks and red flags |
 | "What changed in CRWD's risk factors?" | Red-lines this year's filing against last year's and explains what matters |
-| "Comps for semiconductors" | Valuation table for the peer group |
+| "Comps for semiconductors" | Valuation table for the peer group (P/E, EV/Sales, EV/EBITDA, FCF yield, growth, margins) |
 | "AAPL just reported, do an earnings update" | Post-earnings note checked against your thesis |
 | "Help me initiate on AMD" | Step-by-step full initiation report, with you making the calls |
 | "Red team my thesis" / "Mock interview me on my AMD pitch" | A tough PM tears into your work |

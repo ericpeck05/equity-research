@@ -6,6 +6,8 @@ import csv
 from datetime import date
 from pathlib import Path
 
+import pandas as pd
+
 from . import config, diff, financials, sections, sec
 
 
@@ -80,14 +82,20 @@ def cmd_financials(a):
     print(f"{co.name}: annual ($M where money)\n")
     money = [i for i in with_pct.index if "%" not in i and i != "Diluted EPS"]
     with_pct.loc[money] = with_pct.loc[money] / 1e6
-    print(with_pct.round(1).to_string())
+    print(with_pct.to_string(float_format=lambda v: f"{v:,.2f}" if abs(v) < 20 else f"{v:,.0f}"))
     print(f"\nSaved: {d / 'financials.xlsx'} (+ CSVs). Every number is traced on the 'Sources' sheet.")
+
+
+def _fmt(v):
+    if isinstance(v, float):
+        return f"{v:,.2f}" if abs(v) < 1000 else f"{v:,.0f}"
+    return "n/a" if v is None else str(v)
 
 
 def cmd_market(a):
     from . import market
-    for k, v in market.quote(a.ticker).items():
-        print(f"{k:<22} {v}")
+    for k, v in market.valuation(a.ticker, price=a.price).items():
+        print(f"{k:<24} {_fmt(v)}")
 
 
 def _universe() -> list[dict]:
@@ -106,10 +114,16 @@ def cmd_comps(a):
     if not tickers:
         raise SystemExit("Give tickers (comps NVDA AMD AVGO) or --subsector Semiconductors")
     df = market.comps(tickers)
-    out = config.COVERAGE_DIR / "_comps" / f"comps_{a.subsector or 'custom'}_{date.today()}.csv"
+    out = config.COVERAGE_DIR / "_comps" / f"comps_{(a.subsector or 'custom').replace(' ', '_')}_{date.today()}.csv"
     out.parent.mkdir(exist_ok=True)
     df.to_csv(out)
-    print(df.to_string())
+    cols = [c for c in df.columns if c not in ("Company", "Sources")]
+    show = df[cols].apply(pd.to_numeric, errors="coerce")
+    print(show.to_string(float_format=lambda v: f"{v:,.1f}"))
+    errors = df[df["Company"].astype(str).str.startswith("error")]
+    for t, row in errors.iterrows():
+        print(f"{t}: {row['Company']}")
+    print("\nPrice from Yahoo; everything else from SEC filings (TTM = last 4 quarters).")
     print(f"\nSaved -> {out}")
 
 
@@ -146,7 +160,8 @@ def main(argv=None):
     s.add_argument("ticker"); s.add_argument("--years", type=int, default=6); s.set_defaults(fn=cmd_financials)
 
     s = sub.add_parser("market", help="price and valuation multiples")
-    s.add_argument("ticker"); s.set_defaults(fn=cmd_market)
+    s.add_argument("ticker"); s.add_argument("--price", type=float, help="use this price instead of Yahoo's")
+    s.set_defaults(fn=cmd_market)
 
     s = sub.add_parser("comps", help="comparable-company table")
     s.add_argument("tickers", nargs="*"); s.add_argument("--subsector")

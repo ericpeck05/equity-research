@@ -43,7 +43,7 @@ def test_annual_merges_concepts_and_derives_metrics():
 def test_q4_is_derived_from_full_year():
     _, q, src = financials.build(_facts())
     assert q.loc["Revenue", "2025-09-27"] == 1200 - 280 - 290 - 300
-    assert (src["note"] == "derived: FY minus Q1-Q3").any()
+    assert src["note"].str.startswith("derived").any()
 
 
 HTML = """<html><body>
@@ -76,3 +76,49 @@ def test_diff_classifies_changes():
     md, stats = diff.compare(old, new, "FY24", "FY25")
     assert stats == {"old_paragraphs": 2, "new_paragraphs": 2, "added": 1, "removed": 1, "modified": 1}
     assert "**Taiwan.**" in md
+
+
+def test_stock_split_restates_older_eps_and_shares():
+    def sh(start, end, val, filed):
+        return _fact(start, end, val, filed=filed)
+    facts = _facts()
+    g = facts["facts"]["us-gaap"]
+    g["WeightedAverageNumberOfDilutedSharesOutstanding"] = {"units": {"shares": [
+        sh("2022-09-25", "2023-09-30", 100, "2023-11-01"),
+        sh("2023-10-01", "2024-09-28", 101, "2024-11-01"),
+        sh("2023-10-01", "2024-09-28", 1010, "2025-11-01"),   # 10:1 split restated
+        sh("2024-09-29", "2025-09-27", 1020, "2025-11-01"),
+    ]}}
+    g["EarningsPerShareDiluted"] = {"units": {"USD/shares": [
+        sh("2022-09-25", "2023-09-30", 9.0, "2023-11-01"),
+        sh("2024-09-29", "2025-09-27", 1.2, "2025-11-01"),
+    ]}}
+    assert financials.split_events(facts) == [(financials.date(2025, 11, 1), 10.0)]
+    a, _, _ = financials.build(facts)
+    assert list(a.loc["Diluted shares"]) == [1000, 1010, 1020]
+    assert round(a.loc["Diluted EPS"].iloc[0], 6) == 0.9
+
+
+def test_page_headers_and_styled_headings():
+    html = """<p>Item 1A.</p><p>Risk Factors</p><p>Item 1B.</p>
+    <p>ITEM 1A. RIS<span>K FACTORS</span></p>
+    <p>Competition in cloud and AI services is intense and could reduce our margins over time.</p>
+    <p>Item 1A</p>
+    <p>Our global operations subject us to export controls and sanctions in many countries.</p>
+    <p>ITEM 1B. UNRESOLVED STAFF COMMENTS</p>"""
+    text = sec.html_to_text(html)
+    assert "ITEM 1A. RISK FACTORS" in text
+    rf = sections.extract(text, "risk_factors")
+    assert "Competition" in rf and "export controls" in rf and "UNRESOLVED" not in rf
+
+
+def test_year_to_date_cash_flows_become_quarters():
+    facts = _facts()
+    facts["facts"]["us-gaap"]["NetCashProvidedByUsedInOperatingActivities"] = {"units": {"USD": [
+        _fact("2024-09-29", "2024-12-28", 100, "10-Q"),
+        _fact("2024-09-29", "2025-03-29", 210, "10-Q"),   # 6 months YTD
+        _fact("2024-09-29", "2025-06-28", 330, "10-Q"),   # 9 months YTD
+        _fact("2024-09-29", "2025-09-27", 460),           # full year
+    ]}}
+    _, q, _ = financials.build(facts)
+    assert list(q.loc["Operating cash flow"]) == [100, 110, 120, 130]

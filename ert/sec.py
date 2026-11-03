@@ -15,8 +15,12 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
+import warnings
+
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning
+
+warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
 
 from . import config
 
@@ -124,10 +128,11 @@ def html_to_text(html: str) -> str:
         if el.find(["p", "div", "tr", "li", "table"]):
             continue
         if el.name == "tr":
-            cells = [c.get_text(" ", strip=True) for c in el.find_all(["td", "th"])]
+            cells = [re.sub(r"\s+", " ", c.get_text("")).strip() for c in el.find_all(["td", "th"])]
             text = " | ".join(c for c in cells if c)
         else:
-            text = el.get_text(" ", strip=True)
+            # "" (not " ") so styled letters in headings aren't split ("RIS K FACTORS").
+            text = el.get_text("")
         text = re.sub(r"\s+", " ", text.replace("\xa0", " ")).strip()
         if text:
             blocks.append(text)
