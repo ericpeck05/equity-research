@@ -6,7 +6,8 @@ Claude does the coding and the data work, the owner does the judgment.
 
 ## How the pieces fit
 - `python research.py <command>` pulls **free** data: SEC EDGAR (filings, XBRL financials)
-  and Yahoo Finance via yfinance (prices, multiples). Run `python research.py -h`.
+  and Yahoo Finance via yfinance (share prices only; multiples are computed from SEC data).
+  Run `python research.py -h`.
 - `.claude/skills/` holds the research workflows (snapshot, filing review, what-changed,
   earnings update, initiation, red team, log a call). Claude is the analysis layer; there is
   no paid API.
